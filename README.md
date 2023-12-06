@@ -1,4 +1,4 @@
 # Road Runner Quickstart
+## FTC 22347
 
-Check out the [docs](https://rr.brott.dev/docs/v1-0/tuning/).
-
+Falcon Robotics - White (22347) Java code for the 2023-2024 FTC CenterStage season.
