@@ -116,6 +116,13 @@ public class OpModeTeleOp extends OpMode {
         /* Misc */
         lastLeftBumperValue = gamepad2.left_bumper;
         lastRightBumperValue = gamepad2.right_bumper;
+
+        /* TTS */
+        if (gamepad1.a) {
+            telemetry.update();
+            telemetry.speak("Finger", null, null);
+            telemetry.update();
+        }
     }
 
     /**
