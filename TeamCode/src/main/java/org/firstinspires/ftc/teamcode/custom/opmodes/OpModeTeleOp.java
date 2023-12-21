@@ -28,7 +28,7 @@ public class OpModeTeleOp extends OpMode {
     @Override
     public void init() {
         driveBase = new DriveBase(hardwareMap);
-        driveBase.dropOdometry(true);
+        driveBase.dropOdometry(false);
 
         lift = new Lift(hardwareMap);
         intake = new Intake(hardwareMap);
