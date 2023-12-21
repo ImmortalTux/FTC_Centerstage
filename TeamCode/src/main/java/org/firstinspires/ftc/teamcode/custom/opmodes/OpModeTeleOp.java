@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.custom.opmodes;
 import com.qualcomm.robotcore.eventloop.opmode.*;
 
 import org.firstinspires.ftc.teamcode.custom.*;
-import org.firstinspires.ftc.teamcode.custom.math.Clamp;
+import org.firstinspires.ftc.teamcode.custom.math.MUtils;
 import org.firstinspires.ftc.teamcode.custom.subsystems.*;
 import org.firstinspires.ftc.teamcode.custom.subsystems.DroneLauncher;
 
@@ -85,10 +85,10 @@ public class OpModeTeleOp extends OpMode {
         }
 
         liftPositionInputBuffer = gamepad2.x ?
-                Clamp.clamp(liftPositionInputBuffer, Lift.LiftPosition.ZERO - 20, Lift.LiftPosition.POSITION_VERTICAL)
+                MUtils.clamp(liftPositionInputBuffer, Lift.LiftPosition.ZERO - 20, Lift.LiftPosition.POSITION_VERTICAL)
                 :
-                Clamp.clamp(liftPositionInputBuffer, Lift.LiftPosition.ZERO, Lift.LiftPosition.POSITION_VERTICAL);
-        armPositionInputBuffer = Clamp.clamp(armPositionInputBuffer, Lift.ArmPosition.ZERO - 20, Lift.ArmPosition.POSITION_LEVEL_3);
+                MUtils.clamp(liftPositionInputBuffer, Lift.LiftPosition.ZERO, Lift.LiftPosition.POSITION_VERTICAL);
+        armPositionInputBuffer = MUtils.clamp(armPositionInputBuffer, Lift.ArmPosition.ZERO - 20, Lift.ArmPosition.POSITION_LEVEL_3);
         lift.setLiftPosition(liftPositionInputBuffer);
         lift.setArmPosition(armPositionInputBuffer);
 

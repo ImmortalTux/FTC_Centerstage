@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.custom.subsystems;
 
 import com.qualcomm.robotcore.hardware.*;
 
+import org.firstinspires.ftc.teamcode.custom.math.MUtils;
+
 public class Lift extends Subsystem {
     private int liftTargetPosition = 0;
 
@@ -44,6 +46,12 @@ public class Lift extends Subsystem {
      */
     private final DcMotor liftMotor, armMotor;
 
+    /*
+     * @brief       Used to confirm and help lift ensure it's touching the ground properly.
+     * @note        this touch sensor only returns values 1 and 0.
+     */
+    private final TouchSensor groundConfirmation;
+
     /**
      * @brief       Initializes all resources required by lift
      *
@@ -54,6 +62,7 @@ public class Lift extends Subsystem {
 
         liftMotor = map.dcMotor.get("Lift-LiftMotor");
         armMotor = map.dcMotor.get("Lift-ArmMotor");
+        groundConfirmation = map.touchSensor.get("Lift-GroundConfirmation");
 
         liftMotor.setTargetPosition(0);
         liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -83,36 +92,6 @@ public class Lift extends Subsystem {
         liftMotor.setTargetPosition(position);
     }
 
-    public void update() {
-        int tp = liftTargetPosition;
-        int mp = liftMotor.getCurrentPosition();
-        int absTp = Math.abs(tp);
-        int absMp = Math.abs(mp);
-        int thresh = 30;
-        int k = absTp - absMp;
-        double normalizedK = Math.min(k / 50, 1);
-
-//        if ((tp + thresh) > mp && (tp - thresh) < mp){
-//            liftMotor.setPower(0);
-//        }
-        if (tp < mp){
-            liftMotor.setPower(-1 + normalizedK);
-        } else if (tp > mp) {
-            liftMotor.setPower(1 - normalizedK);
-        }
-    }
-        /*
-        if (liftTargetPosition < liftMotor.getCurrentPosition()) {
-
-            liftMotor.setPower((Math.abs(liftTargetPosition) - Math.abs(liftMotor.getCurrentPosition()) > LIFT_TARGET_MAX_DISTANCE) ? -1.0 : 0.0);
-            // return;
-        } else if (liftTargetPosition >= liftMotor.getCurrentPosition()) {
-            liftMotor.setPower((Math.abs(liftTargetPosition) - Math.abs(liftMotor.getCurrentPosition()) > LIFT_TARGET_MAX_DISTANCE) ? 1.0 : 0.0);
-
-        } else {}
-         */
-//    }
-
     /**
      * @brief       Sets target position for lift to move out horizontally.
      * @param       position: Target encoder tick position.
@@ -139,6 +118,21 @@ public class Lift extends Subsystem {
      *
      */
     public int getLiftTargetPosition() {
-        return liftTargetPosition;
+        return liftMotor.getTargetPosition();
+    }
+
+    public void update() {
+        if (groundConfirmation.isPressed()) {
+            setLiftPosition(0);
+            liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            return;
+        }
+
+        int liftTargetPos = getLiftTargetPosition();
+        if (!groundConfirmation.isPressed() && liftTargetPos == LiftPosition.ZERO &&
+                MUtils.withinRange(getLiftMotorTicks(), liftTargetPos, 2)) {
+            setLiftPosition(liftTargetPos - 20);
+        }
     }
 }

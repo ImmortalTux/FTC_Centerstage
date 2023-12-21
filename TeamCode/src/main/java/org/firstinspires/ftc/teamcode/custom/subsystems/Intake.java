@@ -21,7 +21,7 @@ public class Intake extends Subsystem {
     /**
      * @brief       Color sensors used to confirm that a pixel is in a given chamber.
      */
-    /* private final ColorSensor leftPixelConfirmation, rightPixelConfirmation; */
+    private final ColorSensor leftPixelConfirmation, rightPixelConfirmation;
 
     /**
      * @brief       Initializes all resources required by Intake.
@@ -38,8 +38,8 @@ public class Intake extends Subsystem {
         wristVertical = map.servo.get("Intake-WristVertical");
         wristHorizontal = map.servo.get("Intake-WristHorizontal");
 
-        /* leftPixelConfirmation = map.colorSensor.get("Intake-LeftPixelConfirmation");
-        rightPixelConfirmation = map.colorSensor.get("Intake-RightPixelConfirmation"); */
+        leftPixelConfirmation = map.colorSensor.get("Intake-LeftPixelConfirmation");
+        rightPixelConfirmation = map.colorSensor.get("Intake-RightPixelConfirmation");
 
         /* Vertical servo is level with ground at position 1.0 */
         setWristPosition(0.0, 1.0);
@@ -64,12 +64,6 @@ public class Intake extends Subsystem {
 
         rightClaw.setPosition((rightToggle) ? CLAW_POSITION_CLOSE : CLAW_POSITION_OPEN);
         leftClaw.setPosition((leftToggle) ? CLAW_POSITION_CLOSE : CLAW_POSITION_OPEN);
-    }
-
-    /**
-     * @brief       Closes Right intake claw and checks that a pixel is properly in there.
-     */
-    public void closeRightClaw(boolean toggle) {
     }
 
     /**
