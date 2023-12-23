@@ -28,7 +28,7 @@ public class OpModeTeleOp extends OpMode {
     @Override
     public void init() {
         driveBase = new DriveBase(hardwareMap);
-        driveBase.dropOdometry(true);
+        driveBase.dropOdometry(false);
 
         lift = new Lift(hardwareMap);
         intake = new Intake(hardwareMap);
@@ -58,6 +58,7 @@ public class OpModeTeleOp extends OpMode {
     @Override
     public void loop() {
         Clock.updateDeltaTime();
+        lift.update();
 
         /* Drive base */
         driveBase.motorSpeedMultiplier = 0.8 - Math.min(gamepad1.left_trigger, 0.5);
