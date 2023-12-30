@@ -62,7 +62,9 @@ public final class MecanumDrive {
         // drive model parameters
         public double inPerTick = 0.000574838183; // 50in divided by 85570 ticks traveled during this test.
         public double lateralInPerTick = 0.0003293460612984005;
-        public double trackWidthTicks = 20528.380530096754;
+
+        // public double trackWidthTicks = 20528.380530096754; // Old value
+        public double trackWidthTicks = 22950.170211886914;
 
         // feedforward parameters (in tick units)
         public double kS = 2.027769100934928;
@@ -81,7 +83,7 @@ public final class MecanumDrive {
         // path controller gains
         public double axialGain = 0.0;
         public double lateralGain = 0.0;
-        public double headingGain = 0.0; // shared with turn
+        public double headingGain = 5.0; // shared with turn
 
         public double axialVelGain = 0.0;
         public double lateralVelGain = 0.0;
