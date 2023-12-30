@@ -27,6 +27,7 @@ public class AutoBlueShort extends OpMode {
     private final int LIFT_MOTOR_RPM = 312;
     private final double LIFT_ENC_RESOLUTION = 537.7;
     private final int ERROR_RANGE = 10;
+    private final int TICKS_PER_INCH = 1174; // TODO: Update this!
 
     private int currentStage;
     private int errorRange;
@@ -79,6 +80,11 @@ public class AutoBlueShort extends OpMode {
 
         visionPortal.setProcessorEnabled(tfodProcessor, true);
         tfodProcessor.setMinResultConfidence(0.75f);
+
+        telemetry.addLine("REMEMBER!");
+        telemetry.addLine("Wait at least 5-10 seconds to MAKE sure that TensorFlow can find the team prop.");
+        telemetry.addLine("If you immediately start the program, there is a chance that it will not find the team prop.");
+        telemetry.update();
     }
 
     /**
@@ -111,6 +117,9 @@ public class AutoBlueShort extends OpMode {
             }
         }
 
+        telemetry.addData("Current Piece Side", teamPropSide);
+        telemetry.addData("IDs", currentRecognitions);
+
         telemetry.update();
     }
 
@@ -133,10 +142,33 @@ public class AutoBlueShort extends OpMode {
         driveBase.odometry.update(telemetry);
 
         if (currentStage == 1) {
+            lift.setLiftPosition(0);
+            if (lift.getLiftMotorTicks() >= -ERROR_RANGE &&
+                lift.getLiftMotorTicks() <= +ERROR_RANGE) {
+                currentStage++;
+            }
 
         } else if (currentStage == 2) {
+            if (    !(driveBase.odometry.getLeftEncoderTicksRaw() >= (24 * TICKS_PER_INCH) - ERROR_RANGE &&
+                    driveBase.odometry.getLeftEncoderTicksRaw() <= (24 * TICKS_PER_INCH) + ERROR_RANGE)) {
+                driveBase.moveSpeed(1, 0, 0);
+            } else {
+                driveBase.moveSpeed(0, 0, 0);
+            }
 
         } else if (currentStage == 3) {
+            switch (teamPropSide) {
+                case 1:
+                    // Left
+
+                case 2:
+                    // Center
+
+                case 3:
+                    // Right
+
+                default:
+            }
 
         } else if (currentStage == 4) {
 
@@ -162,11 +194,8 @@ public class AutoBlueShort extends OpMode {
 
         }
 
-        /// All telemetry updating
-        telemetry.addData("Current Piece Side", teamPropSide);
-        telemetry.addData("Current Stage", currentStage);
-        telemetry.addData("Current Lift Position", lift.getLiftMotorTicks());
-        telemetry.addData("IDs", currentRecognitions);
+        /// SECTION: Telemetry updating
+        telemetry.addData("Current Stage:", currentStage);
 
         telemetry.update();
     }
