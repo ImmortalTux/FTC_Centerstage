@@ -114,6 +114,8 @@ public class Lift extends Subsystem {
         return armMotor.getCurrentPosition();
     }
 
+    public DcMotor getLiftMotor() { return liftMotor; }
+
     /**
      *
      */
