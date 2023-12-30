@@ -87,7 +87,31 @@ public class AutoBlueShort extends OpMode {
      */
     @Override
     public void init_loop() {
+        currentRecognitions = tfodProcessor.getRecognitions();
 
+        lift.setLiftPosition(
+                (int)((((LIFT_MOTOR_RPM * LIFT_ENC_RESOLUTION) / 360) / 360) * 28) * 45
+        );
+
+        // Recognize where the team prop is placed.
+        if (currentRecognitions.isEmpty()) {
+            teamPropSide = 3;
+        } else {
+            for (Recognition recognition : currentRecognitions) {
+                double x = (recognition.getLeft() + recognition.getRight()) / 2;
+                if (x > 0 && x < 213.3) {
+                    teamPropSide = 1;                   // Team prop is on the left
+                } else if (x > 213 && x < 426.3) {
+                    teamPropSide = 2;                   // Team prop is in the center
+                } else if (x > 426.3 && x < 640) {
+                    teamPropSide = 3;                   // Team prop is on the right
+                } else {
+                    // TODO: Add error handling
+                }
+            }
+        }
+
+        telemetry.update();
     }
 
     /**
@@ -108,45 +132,11 @@ public class AutoBlueShort extends OpMode {
         Clock.updateDeltaTime();
         driveBase.odometry.update(telemetry);
 
-        currentRecognitions = tfodProcessor.getRecognitions();
-
         if (currentStage == 1) {
-            intake.closeClaws(true, true);
-            currentStage++;
 
         } else if (currentStage == 2) {
-            lift.setLiftPosition(
-                    (int)((((LIFT_MOTOR_RPM * LIFT_ENC_RESOLUTION) / 360) / 360) * 28) * 45
-            );
-
-            if (    lift.getLiftMotorTicks() > lift.getLiftTargetPosition() - ERROR_RANGE &&
-                    lift.getLiftMotorTicks() < lift.getLiftTargetPosition() + ERROR_RANGE
-            ) {
-                currentStage++;
-            }
 
         } else if (currentStage == 3) {
-            // Recognize where the team prop is placed.
-            if (currentRecognitions.isEmpty()) {
-                teamPropSide = 3;
-            } else {
-                for (Recognition recognition : currentRecognitions) {
-                    double x = (recognition.getLeft() + recognition.getRight()) / 2;
-                    if (x > 0 && x < 213.3) {
-                        teamPropSide = 1;                   // Team prop is on the left
-                    } else if (x > 213 && x < 426.3) {
-                        teamPropSide = 2;                   // Team prop is in the center
-                    } else if (x > 426.3 && x < 640) {
-                        teamPropSide = 3;                   // Team prop is on the right
-                    } else {
-                        // TODO: Add error handling
-                    }
-                }
-            }
-
-            if (teamPropSide != 0) {
-                currentStage++;
-            }
 
         } else if (currentStage == 4) {
 
