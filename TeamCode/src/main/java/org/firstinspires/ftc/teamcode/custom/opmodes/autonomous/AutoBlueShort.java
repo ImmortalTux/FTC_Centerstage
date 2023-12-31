@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.custom.opmodes.autonomous;
 
+import android.os.Environment;
 import android.util.Size;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -24,8 +25,8 @@ public class AutoBlueShort extends OpMode {
 
     private final int LIFT_MOTOR_RPM = 312;
     private final double LIFT_ENC_RESOLUTION = 537.7;
-    private final int ERROR_RANGE = 10;
-    private final int TICKS_PER_INCH = 1174; // TODO: Update this!
+    private static final int ERROR_RANGE = 10;
+    private static final int TICKS_PER_INCH = 1174; // TODO: Update this!
 
     private int currentStage;
 
@@ -38,7 +39,8 @@ public class AutoBlueShort extends OpMode {
     // Stuff required for TensorFlow object detection.
     private TfodProcessor tfodProcessor = null;
     private VisionPortal visionPortal = null;
-    private static final String TFOD_MODEL_FILE = "/sdcard/FIRST/tflitemodels/22347-teampiece.tflite";
+//    private static final String TFOD_MODEL_FILE = "/sdcard/FIRST/tflitemodels/22347-teampiece.tflite";
+    private static final String TFOD_MODEL_FILE = Environment.getExternalStorageDirectory().getPath() + "/FIRST/tflitemodels/22347-teampiece.tflite";
     private static final String[] MODEL_LABELS = {
             "Piece"
     };
@@ -105,8 +107,6 @@ public class AutoBlueShort extends OpMode {
                     teamPropSide = 2;                   // Team prop is in the center
                 } else if (x > 426.3 && x < 640) {
                     teamPropSide = 3;                   // Team prop is on the right
-                } else {
-                    // TODO: Add error handling
                 }
             }
         }
