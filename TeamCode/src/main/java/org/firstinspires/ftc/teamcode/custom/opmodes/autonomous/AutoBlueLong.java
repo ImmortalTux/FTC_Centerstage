@@ -18,7 +18,7 @@ import org.firstinspires.ftc.vision.tfod.TfodProcessor;
 import java.util.List;
 
 @Autonomous(name = "OpMode - Autonomous - Blue Short")
-public class AutoBlueShort extends OpMode {
+public class AutoBlueLong extends OpMode {
     private DriveBase driveBase = null;
     private Lift lift = null;
     private Intake intake = null;
@@ -204,26 +204,31 @@ public class AutoBlueShort extends OpMode {
             lift.setLiftPosition((int)((((LIFT_MOTOR_RPM * LIFT_ENC_RESOLUTION) / 360) / 360) * 28) * 10);
 
         } else if (currentState == 5) {
-            // TODO: Add code to drive towards the backstage area while also facing the backdrop.
+            // TODO: Add code to drive around the tape markers.
+            // Maybe with driveBase.movePower(-1, 0, 0)?
             // AVOID THE PIXEL IF ON THE RIGHT SIDE!
 
         } else if (currentState == 6) {
+            // TODO: Add code to drive towards the backstage area while also facing the backdrop.
+            // AVOID THE PIXEL IF ON THE RIGHT SIDE!
+
+        } else if (currentState == 7) {
             /* TODO: Add code to either strafe across the backdrop or stay far back enough that
                      the camera can see all three AprilTags on the backdrop. */
 
-        } else if (currentState == 7) {
+        } else if (currentState == 8) {
             // TODO: Raise lift high enough to place the remaining pixel on the backdrop.
             lift.setLiftPosition(Lift.LiftPosition.POSITION_LEVEL_2);
             lift.setArmPosition(Lift.ArmPosition.POSITION_LEVEL_2);
 
-        } else if (currentState == 8) {
+        } else if (currentState == 9) {
             /* TODO: Drive forward until the claw is pressed against the backdrop.
                      Double check using the motor velocity. */
 
-        } else if (currentState == 9) {
+        } else if (currentState == 10) {
             intake.closeClaws(false, false);
 
-        } else if (currentState == 10) {
+        } else if (currentState == 11) {
             /* TODO: Drive back a small amount that frees the pixel and lets it fall while also
                      staying inside the parking zone for both sets of points. */
 

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.custom.opmodes;
+package org.firstinspires.ftc.teamcode.custom.opmodes.teleop;
 
 import com.qualcomm.robotcore.eventloop.opmode.*;
 
@@ -18,9 +18,7 @@ public class OpModeTeleOp extends OpMode {
     private boolean leftClawInputBuffer = true, rightClawInputBuffer = true;
     private boolean lastLeftBumperValue = false, lastRightBumperValue = false;
 
-    private double wristVerticalInputBuffer = 0.0, wristHorizontalInputBuffer = 0.0;
-
-    private final int LIFT_MOVE_TPS = 1000, ARM_MOVE_TPS = 800;
+    private static final int LIFT_MOVE_TPS = 1000, ARM_MOVE_TPS = 800;
 
     /**
      * @brief       Code ran to initialize robot.
@@ -127,7 +125,7 @@ public class OpModeTeleOp extends OpMode {
     }
 
     /**
-     * @breif       Ran once robot is told to stop. Cleanup code goes here.
+     * @brief       Ran once robot is told to stop. Cleanup code goes here.
      */
     @Override
     public void stop() {
