@@ -15,7 +15,7 @@ public class TestDropOdometry extends LinearOpMode {
 
         waitForStart();
         while (opModeIsActive()) {
-            driveBase.dropOdometry(false);
+            driveBase.dropOdometry(true);
         }
 
         driveBase.cleanup();
