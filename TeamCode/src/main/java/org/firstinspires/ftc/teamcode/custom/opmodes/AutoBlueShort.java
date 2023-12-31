@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.custom.opmodes;
 
 import android.util.Size;
 
-import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
@@ -18,7 +17,6 @@ import org.firstinspires.ftc.vision.tfod.TfodProcessor;
 import java.util.List;
 
 @Autonomous(name = "OpMode - Autonomous - Blue Short")
-@Config
 public class AutoBlueShort extends OpMode {
     private DriveBase driveBase = null;
     private Lift lift = null;
@@ -30,7 +28,6 @@ public class AutoBlueShort extends OpMode {
     private final int TICKS_PER_INCH = 1174; // TODO: Update this!
 
     private int currentStage;
-    private int errorRange;
 
     // 0 is unchanged (no side identified)
     // 1 is Left
@@ -54,7 +51,7 @@ public class AutoBlueShort extends OpMode {
     public void init() {
         driveBase = new DriveBase(hardwareMap);
         driveBase.dropOdometry(true);
-        driveBase.motorSpeedMultiplier = 0.3;
+        driveBase.motorSpeedMultiplier = 0.33;
         driveBase.odometry.resetEncoders();
 
         lift = new Lift(hardwareMap);
@@ -63,7 +60,6 @@ public class AutoBlueShort extends OpMode {
         intake.closeClaws(true, true);
 
         currentStage = 0;
-        errorRange = 30;
 
         /// SECTION: Initialization of the TensorFlow Processor
         tfodProcessor = new TfodProcessor.Builder()
@@ -95,9 +91,7 @@ public class AutoBlueShort extends OpMode {
     public void init_loop() {
         currentRecognitions = tfodProcessor.getRecognitions();
 
-        lift.setLiftPosition(
-                (int)((((LIFT_MOTOR_RPM * LIFT_ENC_RESOLUTION) / 360) / 360) * 28) * 45
-        );
+        lift.setLiftPosition((int)((((LIFT_MOTOR_RPM * LIFT_ENC_RESOLUTION) / 360) / 360) * 28) * 45);
 
         // Recognize where the team prop is placed.
         if (currentRecognitions.isEmpty()) {
@@ -129,6 +123,7 @@ public class AutoBlueShort extends OpMode {
     @Override
     public void start() {
         Clock.init();
+        telemetry.clearAll();
 
         currentStage = 1;
     }
@@ -144,13 +139,15 @@ public class AutoBlueShort extends OpMode {
         if (currentStage == 1) {
             lift.setLiftPosition(0);
             if (lift.getLiftMotorTicks() >= -ERROR_RANGE &&
-                lift.getLiftMotorTicks() <= +ERROR_RANGE) {
+                lift.getLiftMotorTicks() <= ERROR_RANGE) {
+                // Lift position is 0 so 0 - ERROR_RANGE will just equal -ERROR_RANGE.
+                // and the same goes for 0 + ERROR_RANGE, it will just be (+)ERROR_RANGE.
                 currentStage++;
             }
 
         } else if (currentStage == 2) {
-            if (    !(driveBase.odometry.getLeftEncoderTicksRaw() >= (24 * TICKS_PER_INCH) - ERROR_RANGE &&
-                    driveBase.odometry.getLeftEncoderTicksRaw() <= (24 * TICKS_PER_INCH) + ERROR_RANGE)) {
+            if (!(driveBase.odometry.getLeftEncoderTicksRaw() >= (24 * TICKS_PER_INCH) - ERROR_RANGE &&
+                driveBase.odometry.getLeftEncoderTicksRaw() <= (24 * TICKS_PER_INCH) + ERROR_RANGE)) {
                 driveBase.moveSpeed(1, 0, 0);
             } else {
                 driveBase.moveSpeed(0, 0, 0);
@@ -158,40 +155,80 @@ public class AutoBlueShort extends OpMode {
 
         } else if (currentStage == 3) {
             switch (teamPropSide) {
+                /* TODO: Possible replace driveBase.odometry.getPosition().heading with
+                         anything else in case the odometry class isn't working. */
                 case 1:
-                    // Left
+                    /* TODO: This probably needs to be changed. I need to figure out how
+                     *   the odometry class in our drive base works. */
+                    if (driveBase.odometry.getPosition().heading > 270 - (ERROR_RANGE / 2.0) &&
+                        driveBase.odometry.getPosition().heading < 270 + (ERROR_RANGE / 2.0)) {
+                        driveBase.moveSpeed(0, 0, 0);
+
+                        currentStage++;
+
+                    } else if (driveBase.odometry.getPosition().heading < 270) {
+                        driveBase.moveSpeed(0, 0, -1);
+
+                    } else if ( driveBase.odometry.getPosition().heading > 270) {
+                        driveBase.moveSpeed(0, 0, 1);
+
+                    }
 
                 case 2:
-                    // Center
+                    // TODO: Nothing may need to be done here as the robot will already be facing the forward tape.
 
                 case 3:
-                    // Right
+                    /* TODO: This probably needs to be changed. I need to figure out how
+                     *   the odometry class in our drive base works. */
+                    if (driveBase.odometry.getPosition().heading > 90 - (ERROR_RANGE / 2.0) &&
+                            driveBase.odometry.getPosition().heading < 90 + (ERROR_RANGE / 2.0)) {
+                        driveBase.moveSpeed(0, 0, 0);
+
+                        currentStage++;
+
+                    } else if (driveBase.odometry.getPosition().heading < 90) {
+                        driveBase.moveSpeed(0, 0, -1);
+
+                    } else if ( driveBase.odometry.getPosition().heading > 90) {
+                        driveBase.moveSpeed(0, 0, 1);
+
+                    }
 
                 default:
             }
 
         } else if (currentStage == 4) {
+            // TODO: Add some kind of logic to align the claw with the tape depending on each side.
+            // TODO: Make sure the yellow pixel stays inside the claw while the purple claw is dropped onto the tape.
+            intake.closeClaws(true, false);
+            lift.setLiftPosition((int)((((LIFT_MOTOR_RPM * LIFT_ENC_RESOLUTION) / 360) / 360) * 28) * 10);
 
         } else if (currentStage == 5) {
+            // TODO: Add code to drive towards the backstage area while also facing the backdrop.
+            // AVOID THE PIXEL IF ON THE RIGHT SIDE!
 
         } else if (currentStage == 6) {
+            /* TODO: Add code to either strafe across the backdrop or stay far back enough that
+                     the camera can see all three AprilTags on the backdrop. */
 
         } else if (currentStage == 7) {
+            // TODO: Raise lift high enough to place the remaining pixel on the backdrop.
+            lift.setLiftPosition(Lift.LiftPosition.POSITION_LEVEL_2);
+            lift.setArmPosition(Lift.ArmPosition.POSITION_LEVEL_2);
 
         } else if (currentStage == 8) {
+            /* TODO: Drive forward until the claw is pressed against the backdrop.
+                     Double check using the motor velocity. */
 
         } else if (currentStage == 9) {
+            intake.closeClaws(false, false);
 
         } else if (currentStage == 10) {
-
-        } else if (currentStage == 11) {
-
-        } else if (currentStage == 12) {
-
-        } else if (currentStage == 13) {
+            /* TODO: Drive back a small amount that frees the pixel and lets it fall while also
+                     staying inside the parking zone for both sets of points. */
 
         } else {
-
+            // There should NOT be any other states right now.
         }
 
         /// SECTION: Telemetry updating
