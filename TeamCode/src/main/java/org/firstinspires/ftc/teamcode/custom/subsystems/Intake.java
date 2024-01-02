@@ -1,8 +1,16 @@
 package org.firstinspires.ftc.teamcode.custom.subsystems;
 
 import com.qualcomm.robotcore.hardware.*;
+import org.firstinspires.ftc.teamcode.custom.Color;
 
 public class Intake extends Subsystem {
+    static private class PixelColors {
+        public final Color white = new Color(1660, 2890, 2397, 2700);
+        public final Color green = new Color(320, 1000, 395, 537);
+        public final Color purple = new Color(800, 1245, 1650, 1250);
+        public final Color yellow = new Color(1050, 1500, 410, 995);
+    }
+
     /**
      * @brief       used to ensure one Intake object is being used at a time.
      */
@@ -104,5 +112,36 @@ public class Intake extends Subsystem {
 
     public void setRightClaw(float pos) {
         rightClaw.setPosition(pos);
+    }
+
+    public ColorSensor getLeftPixelConfirmation() {
+        return leftPixelConfirmation;
+    }
+
+    private boolean compareAllPixelColors(Color input) {
+        final int TOLERANCE = 50;
+        return (Color.compare(input, PixelColors.white, TOLERANCE)
+                || Color.compare(input, PixelColors.green, TOLERANCE)
+                || Color.compare(input, PixelColors.purple, TOLERANCE)
+                || Color.compare(input, PixelColors.yellow, TOLERANCE));
+    }
+
+    /* Checks for pixels and automatically closes claws if any are found. */
+    public void update() {
+        Color leftSensor = new Color(leftPixelConfirmation);
+        Color rightSensor = new Color(rightPixelConfirmation);
+
+        boolean leftClose = false;
+        boolean rightClose = false;
+
+        if (compareAllPixelColors(leftSensor))  {
+            leftClose = true;
+        }
+
+        if (compareAllPixelColors(rightSensor)) {
+            rightClose = true;
+        }
+
+        closeClaws(leftClose, rightClose);
     }
 }

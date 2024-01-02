@@ -57,6 +57,7 @@ public class OpModeTeleOp extends OpMode {
     public void loop() {
         Clock.updateDeltaTime();
         lift.update();
+        intake.update();
 
         /* Drive base */
         driveBase.motorSpeedMultiplier = 0.8 - Math.min(gamepad1.left_trigger, 0.5);
@@ -112,6 +113,11 @@ public class OpModeTeleOp extends OpMode {
         intake.closeClaws(leftClawInputBuffer, rightClawInputBuffer);
         intake.setWristPosition(0.0, 1.0);
 
+        telemetry.addData("r", intake.getLeftPixelConfirmation().red());
+        telemetry.addData("g", intake.getLeftPixelConfirmation().green());
+        telemetry.addData("b", intake.getLeftPixelConfirmation().blue());
+        telemetry.addData("a", intake.getLeftPixelConfirmation().alpha());
+
         /* Misc */
         lastLeftBumperValue = gamepad2.left_bumper;
         lastRightBumperValue = gamepad2.right_bumper;
@@ -120,8 +126,9 @@ public class OpModeTeleOp extends OpMode {
         if (gamepad1.a) {
             telemetry.update();
             telemetry.speak("Finger", null, null);
-            telemetry.update();
         }
+
+        telemetry.update();
     }
 
     /**
