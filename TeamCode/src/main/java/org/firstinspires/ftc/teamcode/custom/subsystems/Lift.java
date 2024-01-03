@@ -134,7 +134,7 @@ public class Lift extends Subsystem {
         int liftTargetPos = getLiftTargetPosition();
         if (!groundConfirmation.isPressed() && liftTargetPos == LiftPosition.ZERO &&
                 MUtils.withinRange(getLiftMotorTicks(), liftTargetPos, 2)) {
-            setLiftPosition(liftTargetPos - 20);
+            setLiftPosition(liftTargetPos - 10000);
         }
     }
 }

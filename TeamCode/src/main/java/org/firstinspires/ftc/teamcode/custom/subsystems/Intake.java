@@ -5,10 +5,10 @@ import org.firstinspires.ftc.teamcode.custom.Color;
 
 public class Intake extends Subsystem {
     static private class PixelColors {
-        public final Color white = new Color(1660, 2890, 2397, 2700);
-        public final Color green = new Color(320, 1000, 395, 537);
-        public final Color purple = new Color(800, 1245, 1650, 1250);
-        public final Color yellow = new Color(1050, 1500, 410, 995);
+        static public final Color white = new Color(1660, 2890, 2397, 2700);
+        static public final Color green = new Color(320, 1000, 395, 537);
+        static public final Color purple = new Color(800, 1245, 1650, 1250);
+        static public final Color yellow = new Color(1050, 1500, 410, 995);
     }
 
     /**

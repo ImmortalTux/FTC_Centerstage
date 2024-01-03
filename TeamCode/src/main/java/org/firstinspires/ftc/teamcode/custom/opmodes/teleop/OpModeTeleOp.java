@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.custom.opmodes.teleop;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.*;
 
 import org.firstinspires.ftc.teamcode.custom.*;
@@ -8,6 +9,7 @@ import org.firstinspires.ftc.teamcode.custom.subsystems.*;
 import org.firstinspires.ftc.teamcode.custom.subsystems.DroneLauncher;
 
 @TeleOp(name = "OpMode - TeleOp")
+@Config
 public class OpModeTeleOp extends OpMode {
     private DriveBase driveBase = null;
     private Lift lift = null;
@@ -57,7 +59,6 @@ public class OpModeTeleOp extends OpMode {
     public void loop() {
         Clock.updateDeltaTime();
         lift.update();
-        intake.update();
 
         /* Drive base */
         driveBase.motorSpeedMultiplier = 0.8 - Math.min(gamepad1.left_trigger, 0.5);
@@ -112,6 +113,9 @@ public class OpModeTeleOp extends OpMode {
 
         intake.closeClaws(leftClawInputBuffer, rightClawInputBuffer);
         intake.setWristPosition(0.0, 1.0);
+
+        /* Needs to be called after closeClaws() */
+        intake.update();
 
         telemetry.addData("r", intake.getLeftPixelConfirmation().red());
         telemetry.addData("g", intake.getLeftPixelConfirmation().green());
