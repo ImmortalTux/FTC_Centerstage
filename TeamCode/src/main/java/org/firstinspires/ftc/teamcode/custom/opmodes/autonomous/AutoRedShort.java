@@ -45,6 +45,8 @@ public class AutoRedShort extends OpMode {
     };
     List<Recognition> currentRecognitions = null;
 
+    private AprilTagProcessor aprilTagProcessor;
+
     /**
      * @brief       Code ran to initialize robot.
      */
@@ -78,6 +80,11 @@ public class AutoRedShort extends OpMode {
         visionPortal.setProcessorEnabled(tfodProcessor, true);
         tfodProcessor.setMinResultConfidence(0.75f);
 
+        aprilTagProcessor =
+            new AprilTagProcessor.builder()
+                .setTagLibrary(AprilTagGameDatabase.getCurrentGameTagLibrary());            
+                .build();
+
         telemetry.addLine("REMEMBER!");
         telemetry.addLine("Wait at least 5-10 seconds to MAKE sure that TensorFlow can find the team prop.");
         telemetry.addLine("If you immediately start the program, there is a chance that it will not find the team prop.");
@@ -100,7 +107,7 @@ public class AutoRedShort extends OpMode {
                 double x = (recognition.getLeft() + recognition.getRight()) / 2;
                 if (x > 0 && x < 213.3) {
                     teamPropSide = 1;                   // Team prop is on the left
-                } else if (x > 213 && x < 426.3) {
+                } else if (x > 213.3 && x < 426.3) {
                     teamPropSide = 2;                   // Team prop is in the center
                 } else if (x > 426.3 && x < 640) {
                     teamPropSide = 3;                   // Team prop is on the right
@@ -185,35 +192,68 @@ public class AutoRedShort extends OpMode {
                     }
 
                 default:
+                    break;
             }
 
         } else if (currentState == 4) {
-            // TODO: Add some kind of logic to align the claw with the tape depending on each side.
-            // TODO: Make sure the yellow pixel stays inside the claw while the purple claw is dropped onto the tape.
-            intake.closeClaws(true, false);
-            lift.setLiftPosition((int)((((LIFT_MOTOR_RPM * LIFT_ENC_RESOLUTION) / 360) / 360) * 28) * 10);
-
+            switch (teamPropSide) {
+                case 1:
+                    lift.setArmPosition(220);
+                    
+                case 2:
+                    lift.setArmPosition(150);
+                    
+                case 3:
+                    lift.setArmPosition(330);
+                    
+                default:
+                    break;
+            }
+                
         } else if (currentState == 5) {
-            // TODO: Add code to drive towards the backstage area while also facing the backdrop.
-            // AVOID THE PIXEL IF ON THE RIGHT SIDE!
+            // Open the claws to release and slightly raise the lift.
+            intake.closeClaws(false, true);
+            lift.setLiftPosition((int)((((LIFT_MOTOR_RPM * LIFT_ENC_RESOLUTION) / 360) / 360) * 28) * 45);
 
         } else if (currentState == 6) {
+            driveBase.odometry.resetEncoders();
+            
+            // TODO: Add code to drive towards the backstage area while also facing the backdrop.
+            // AVOID THE PIXEL IF ON THE RIGHT SIDE!
+            switch (teamPropSide) {
+                case 1:
+                    // Move to backdrop from left turn
+                    if (
+                    
+                case 2:
+                    // Move to backdrop from center turn
+                    driveBase.movePower(0, 1, 0);
+                    
+                case 3:
+                    // Move to backdrop from right turn
+                    // TODO: Add code to move AROUND the right pixel.
+                    
+                default:
+                    break;
+            }
+
+        } else if (currentState == 7) {
             /* TODO: Add code to either strafe across the backdrop or stay far back enough that
                      the camera can see all three AprilTags on the backdrop. */
 
-        } else if (currentState == 7) {
+        } else if (currentState == 8) {
             // TODO: Raise lift high enough to place the remaining pixel on the backdrop.
             lift.setLiftPosition(Lift.LiftPosition.POSITION_LEVEL_2);
             lift.setArmPosition(Lift.ArmPosition.POSITION_LEVEL_2);
 
-        } else if (currentState == 8) {
+        } else if (currentState == 9) {
             /* TODO: Drive forward until the claw is pressed against the backdrop.
                      Double check using the motor velocity. */
 
-        } else if (currentState == 9) {
+        } else if (currentState == 10) {
             intake.closeClaws(false, false);
 
-        } else if (currentState == 10) {
+        } else if (currentState == 11) {
             /* TODO: Drive back a small amount that frees the pixel and lets it fall while also
                      staying inside the parking zone for both sets of points. */
 
