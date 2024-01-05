@@ -16,7 +16,7 @@ public class Lift extends Subsystem {
       static final public int ZERO = 0;
 
       static final public int POSITION_INTAKE = ZERO;
-      static final public int POSITION_LEVEL_1 = 1800;
+      static final public int POSITION_LEVEL_1 = 2000;
       static final public int POSITION_LEVEL_2 = 1800;
 
       static final public int POSITION_LEVEL_3 = 1800;
@@ -134,7 +134,7 @@ public class Lift extends Subsystem {
         int liftTargetPos = getLiftTargetPosition();
         if (!groundConfirmation.isPressed() && liftTargetPos == LiftPosition.ZERO &&
                 MUtils.withinRange(getLiftMotorTicks(), liftTargetPos, 2)) {
-            setLiftPosition(liftTargetPos - 10000);
+            setLiftPosition(liftTargetPos - 1);
         }
     }
 }

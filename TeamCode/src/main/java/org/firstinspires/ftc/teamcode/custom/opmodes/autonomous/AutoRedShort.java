@@ -1,11 +1,9 @@
 package org.firstinspires.ftc.teamcode.custom.opmodes.autonomous;
 
-import android.os.Environment;
 import android.util.Size;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
@@ -18,8 +16,8 @@ import org.firstinspires.ftc.vision.tfod.TfodProcessor;
 
 import java.util.List;
 
-@Autonomous(name = "OpMode - Autonomous - Blue Short")
-public class AutoBlueShort extends OpMode {
+@Autonomous(name = "OpMode - Autonomous - Red Short")
+public class AutoRedShort extends OpMode {
     private DriveBase driveBase = null;
     private Lift lift = null;
     private Intake intake = null;
@@ -30,8 +28,6 @@ public class AutoBlueShort extends OpMode {
     private static final int TICKS_PER_INCH = 1711; // TODO: Update this!
 
     private int currentState;
-
-    private static ElapsedTime detectionTimer;
 
     // 0 is unchanged (no side identified)
     // 1 is Left
@@ -58,8 +54,6 @@ public class AutoBlueShort extends OpMode {
         driveBase.dropOdometry(true);
         driveBase.motorSpeedMultiplier = 0.33;
         driveBase.odometry.resetEncoders();
-
-        detectionTimer = new ElapsedTime();
 
         lift = new Lift(hardwareMap);
 
@@ -96,6 +90,26 @@ public class AutoBlueShort extends OpMode {
      */
     @Override
     public void init_loop() {
+        currentRecognitions = tfodProcessor.getRecognitions();
+
+        // Recognize where the team prop is placed.
+        if (currentRecognitions.isEmpty()) {
+            teamPropSide = 3;
+        } else {
+            for (Recognition recognition : currentRecognitions) {
+                double x = (recognition.getLeft() + recognition.getRight()) / 2;
+                if (x > 0 && x < 213.3) {
+                    teamPropSide = 1;                   // Team prop is on the left
+                } else if (x > 213 && x < 426.3) {
+                    teamPropSide = 2;                   // Team prop is in the center
+                } else if (x > 426.3 && x < 640) {
+                    teamPropSide = 3;                   // Team prop is on the right
+                }
+            }
+        }
+
+        telemetry.addData("Current Piece Side", teamPropSide);
+        telemetry.addData("IDs", currentRecognitions);
         telemetry.update();
     }
 
@@ -106,9 +120,6 @@ public class AutoBlueShort extends OpMode {
     public void start() {
         Clock.init();
         telemetry.clearAll();
-
-        detectionTimer.reset();
-        detectionTimer.startTime();
 
         currentState = 1;
     }
@@ -130,120 +141,79 @@ public class AutoBlueShort extends OpMode {
                 currentState++;
             }
 
-            lift.setLiftPosition((int) ((((LIFT_MOTOR_RPM * LIFT_ENC_RESOLUTION) / 360) / 360) * 28) * 45);
-
         } else if (currentState == 2) {
-            if (detectionTimer.seconds() > 5.0) {
-                currentRecognitions = tfodProcessor.getRecognitions();
+            driveBase.odometry.resetEncoders();
 
-                // Recognize where the team prop is placed.
-                if (currentRecognitions.isEmpty()) {
-                    teamPropSide = 3;
-                } else {
-                    for (Recognition recognition : currentRecognitions) {
-                        double x = (recognition.getLeft() + recognition.getRight()) / 2;
-                        if (x > 0 && x < 213.3) {
-                            teamPropSide = 1;                   // Team prop is on the left
-                        } else if (x > 213 && x < 426.3) {
-                            teamPropSide = 2;                   // Team prop is in the center
-                        } else if (x > 426.3 && x < 640) {
-                            teamPropSide = 3;                   // Team prop is on the right
-                        }
-                    }
-                }
-
-                currentState++;
-
-                telemetry.addData("Current Piece Side", teamPropSide);
-                telemetry.addData("IDs", currentRecognitions);
-            }
-
-        } else if (currentState == 3) {
-            if (!(
-                    Math.abs(driveBase.odometry.getLeftEncoderTicksRaw()) >= (26 * TICKS_PER_INCH) - ERROR_RANGE &&
-                    Math.abs(driveBase.odometry.getLeftEncoderTicksRaw()) <= (26 * TICKS_PER_INCH) + ERROR_RANGE
-                ) &&
-                !(
-                    Math.abs(driveBase.odometry.getRightEncoderTicksRaw()) >= (26 * TICKS_PER_INCH) - ERROR_RANGE &&
-                    Math.abs(driveBase.odometry.getRightEncoderTicksRaw()) <= (26 * TICKS_PER_INCH) + ERROR_RANGE)
+            if (
+                    (Math.abs(driveBase.odometry.getLeftEncoderTicksRaw()) >= (26 * TICKS_PER_INCH) - ERROR_RANGE) &&
+                    (Math.abs(driveBase.odometry.getRightEncoderTicksRaw()) >= (26 * TICKS_PER_INCH) - ERROR_RANGE)
             ) {
-                driveBase.moveSpeed(1, 0, 0);
-            } else {
                 driveBase.moveSpeed(0, 0, 0);
                 currentState++;
+            } else {
+                driveBase.moveSpeed(-1, 0, 0);
             }
+        } else if (currentState == 3) {
+            driveBase.odometry.resetEncoders();
 
-        } else if (currentState == 4) {
             switch (teamPropSide) {
                 /* TODO: Possible replace driveBase.odometry.getPosition().heading with
                          anything else in case the odometry class isn't working. */
                 case 1:
-                    /* TODO: This probably needs to be changed. I need to figure out how
-                     *   the odometry class in our drive base works. */
-                    if (driveBase.odometry.getPosition().heading > 270 - (ERROR_RANGE / 2.0) &&
-                        driveBase.odometry.getPosition().heading < 270 + (ERROR_RANGE / 2.0)) {
+                    if (
+                        driveBase.odometry.getLeftEncoderTicksRaw() > 10220 - ERROR_RANGE &&
+                        driveBase.odometry.getRightEncoderTicksRaw() > 17196 - ERROR_RANGE
+                    ) {
                         driveBase.moveSpeed(0, 0, 0);
-
                         currentState++;
-
-                    } else if (driveBase.odometry.getPosition().heading < 270) {
-                        driveBase.moveSpeed(0, 0, -1);
-
-                    } else if ( driveBase.odometry.getPosition().heading > 270) {
+                    } else {
                         driveBase.moveSpeed(0, 0, 1);
-
                     }
 
                 case 2:
                     // TODO: Nothing should have to be done here as the robot will already be facing the forward tape.
 
                 case 3:
-                    /* TODO: This probably needs to be changed. I need to figure out how
-                     *   the odometry class in our drive base works. */
-                    if (driveBase.odometry.getPosition().heading > 90 - (ERROR_RANGE / 2.0) &&
-                            driveBase.odometry.getPosition().heading < 90 + (ERROR_RANGE / 2.0)) {
+                    if (
+                        driveBase.odometry.getLeftEncoderTicksRaw() > -14007 - ERROR_RANGE &&
+                        driveBase.odometry.getRightEncoderTicksRaw() > -14111 - ERROR_RANGE
+                    ) {
                         driveBase.moveSpeed(0, 0, 0);
-
                         currentState++;
-
-                    } else if (driveBase.odometry.getPosition().heading < 90) {
+                    } else {
                         driveBase.moveSpeed(0, 0, -1);
-
-                    } else if ( driveBase.odometry.getPosition().heading > 90) {
-                        driveBase.moveSpeed(0, 0, 1);
-
                     }
 
                 default:
             }
 
-        } else if (currentState == 5) {
+        } else if (currentState == 4) {
             // TODO: Add some kind of logic to align the claw with the tape depending on each side.
             // TODO: Make sure the yellow pixel stays inside the claw while the purple claw is dropped onto the tape.
             intake.closeClaws(true, false);
             lift.setLiftPosition((int)((((LIFT_MOTOR_RPM * LIFT_ENC_RESOLUTION) / 360) / 360) * 28) * 10);
 
-        } else if (currentState == 6) {
+        } else if (currentState == 5) {
             // TODO: Add code to drive towards the backstage area while also facing the backdrop.
             // AVOID THE PIXEL IF ON THE RIGHT SIDE!
 
-        } else if (currentState == 7) {
+        } else if (currentState == 6) {
             /* TODO: Add code to either strafe across the backdrop or stay far back enough that
                      the camera can see all three AprilTags on the backdrop. */
 
-        } else if (currentState == 8) {
+        } else if (currentState == 7) {
             // TODO: Raise lift high enough to place the remaining pixel on the backdrop.
             lift.setLiftPosition(Lift.LiftPosition.POSITION_LEVEL_2);
             lift.setArmPosition(Lift.ArmPosition.POSITION_LEVEL_2);
 
-        } else if (currentState == 9) {
+        } else if (currentState == 8) {
             /* TODO: Drive forward until the claw is pressed against the backdrop.
                      Double check using the motor velocity. */
 
-        } else if (currentState == 10) {
+        } else if (currentState == 9) {
             intake.closeClaws(false, false);
 
-        } else if (currentState == 11) {
+        } else if (currentState == 10) {
             /* TODO: Drive back a small amount that frees the pixel and lets it fall while also
                      staying inside the parking zone for both sets of points. */
 
@@ -253,8 +223,10 @@ public class AutoBlueShort extends OpMode {
 
         /// SECTION: Telemetry updating
         telemetry.addData("Current Stage:", currentState);
-        telemetry.addData("S", detectionTimer.seconds());
 
+        telemetry.addData("L Odo", driveBase.odometry.getLeftEncoderTicksRaw());
+        telemetry.addData("R Odo", driveBase.odometry.getRightEncoderTicksRaw());
+        telemetry.addData("B Odo", driveBase.odometry.getBackEncoderTicksRaw());
         telemetry.update();
     }
 

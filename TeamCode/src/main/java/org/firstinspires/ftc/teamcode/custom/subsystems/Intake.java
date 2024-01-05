@@ -119,7 +119,7 @@ public class Intake extends Subsystem {
     }
 
     private boolean compareAllPixelColors(Color input) {
-        final int TOLERANCE = 50;
+        final int TOLERANCE = 200;
         return (Color.compare(input, PixelColors.white, TOLERANCE)
                 || Color.compare(input, PixelColors.green, TOLERANCE)
                 || Color.compare(input, PixelColors.purple, TOLERANCE)
@@ -127,21 +127,29 @@ public class Intake extends Subsystem {
     }
 
     /* Checks for pixels and automatically closes claws if any are found. */
-    public void update() {
+    public boolean update(boolean leftCloseToggle, boolean rightCloseToggle, int liftEncoderPos) {
+        /*
         Color leftSensor = new Color(leftPixelConfirmation);
         Color rightSensor = new Color(rightPixelConfirmation);
 
-        boolean leftClose = false;
-        boolean rightClose = false;
+        boolean compareSuccessful = false;
+        if (liftEncoderPos < 5) {
+            if (compareAllPixelColors(leftSensor)) {
+                leftCloseToggle = true;
+                compareSuccessful = true;
+            }
 
-        if (compareAllPixelColors(leftSensor))  {
-            leftClose = true;
+            if (compareAllPixelColors(rightSensor)) {
+                    rightCloseToggle = true;
+                    compareSuccessful = true;
+                }
         }
 
-        if (compareAllPixelColors(rightSensor)) {
-            rightClose = true;
-        }
+        closeClaws(leftCloseToggle, rightCloseToggle);
+        return compareSuccessful;
+        */
 
-        closeClaws(leftClose, rightClose);
+        closeClaws(leftCloseToggle, rightCloseToggle);
+        return true;
     }
 }

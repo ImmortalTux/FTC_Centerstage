@@ -60,6 +60,10 @@ public class OpModeTeleOp extends OpMode {
         Clock.updateDeltaTime();
         lift.update();
 
+        if (intake.update(rightClawInputBuffer, leftClawInputBuffer, lift.getLiftMotorTicks())) {
+            telemetry.speak("Finger!");
+        }
+
         /* Drive base */
         driveBase.motorSpeedMultiplier = 0.8 - Math.min(gamepad1.left_trigger, 0.5);
         driveBase.moveSpeed(gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x);
@@ -111,12 +115,6 @@ public class OpModeTeleOp extends OpMode {
             droneLauncher.releaseDrone();
         }
 
-        intake.closeClaws(leftClawInputBuffer, rightClawInputBuffer);
-        intake.setWristPosition(0.0, 1.0);
-
-        /* Needs to be called after closeClaws() */
-        intake.update();
-
         telemetry.addData("r", intake.getLeftPixelConfirmation().red());
         telemetry.addData("g", intake.getLeftPixelConfirmation().green());
         telemetry.addData("b", intake.getLeftPixelConfirmation().blue());
@@ -129,7 +127,7 @@ public class OpModeTeleOp extends OpMode {
         /* TTS */
         if (gamepad1.a) {
             telemetry.update();
-            telemetry.speak("Finger", null, null);
+            telemetry.speak("ffart fart fart fart fart afart meoww.");
         }
 
         telemetry.update();
