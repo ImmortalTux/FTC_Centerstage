@@ -13,6 +13,8 @@ import org.firstinspires.ftc.teamcode.custom.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.custom.subsystems.Lift;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.tfod.TfodProcessor;
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase;
 
 import java.util.List;
 
@@ -34,6 +36,8 @@ public class AutoRedShort extends OpMode {
     // 2 is Center
     // 3 is Right
     private int teamPropSide;
+
+    private boolean resetEncoders;
 
     // Stuff required for TensorFlow object detection.
     private TfodProcessor tfodProcessor = null;
@@ -64,6 +68,8 @@ public class AutoRedShort extends OpMode {
 
         currentState = 0;
 
+        resetEncoders = true;
+
         /// SECTION: Initialization of the TensorFlow Processor
         tfodProcessor = new TfodProcessor.Builder()
                 .setModelFileName(TFOD_MODEL_FILE)
@@ -80,10 +86,10 @@ public class AutoRedShort extends OpMode {
         visionPortal.setProcessorEnabled(tfodProcessor, true);
         tfodProcessor.setMinResultConfidence(0.75f);
 
-        aprilTagProcessor =
-            new AprilTagProcessor.builder()
-                .setTagLibrary(AprilTagGameDatabase.getCurrentGameTagLibrary());            
-                .build();
+        // aprilTagProcessor =
+        //     new AprilTagProcessorBuilder
+        //         .setTagLibrary(AprilTagGameDatabase.getCurrentGameTagLibrary())
+        //         .build();
 
         telemetry.addLine("REMEMBER!");
         telemetry.addLine("Wait at least 5-10 seconds to MAKE sure that TensorFlow can find the team prop.");
@@ -149,29 +155,31 @@ public class AutoRedShort extends OpMode {
             }
 
         } else if (currentState == 2) {
-            driveBase.odometry.resetEncoders();
+            if (resetEncoders) { driveBase.odometry.resetEncoders(); resetEncoders = false; }
 
             if (
-                    (Math.abs(driveBase.odometry.getLeftEncoderTicksRaw()) >= (26 * TICKS_PER_INCH) - ERROR_RANGE) &&
-                    (Math.abs(driveBase.odometry.getRightEncoderTicksRaw()) >= (26 * TICKS_PER_INCH) - ERROR_RANGE)
+                    (Math.abs(driveBase.odometry.getLeftEncoderTicksRaw()) >= (24 * TICKS_PER_INCH) - ERROR_RANGE) &&
+                    (Math.abs(driveBase.odometry.getRightEncoderTicksRaw()) >= (24 * TICKS_PER_INCH) - ERROR_RANGE)
             ) {
                 driveBase.moveSpeed(0, 0, 0);
+                resetEncoders = true;
                 currentState++;
             } else {
                 driveBase.moveSpeed(-1, 0, 0);
             }
         } else if (currentState == 3) {
-            driveBase.odometry.resetEncoders();
+            if (resetEncoders) { driveBase.odometry.resetEncoders(); resetEncoders = false; }
 
             switch (teamPropSide) {
                 /* TODO: Possible replace driveBase.odometry.getPosition().heading with
                          anything else in case the odometry class isn't working. */
                 case 1:
                     if (
-                        driveBase.odometry.getLeftEncoderTicksRaw() > 10220 - ERROR_RANGE &&
-                        driveBase.odometry.getRightEncoderTicksRaw() > 17196 - ERROR_RANGE
+                        Math.abs(driveBase.odometry.getLeftEncoderTicksRaw()) < 10220 - ERROR_RANGE &&
+                        Math.abs(driveBase.odometry.getRightEncoderTicksRaw()) < 17196 - ERROR_RANGE
                     ) {
                         driveBase.moveSpeed(0, 0, 0);
+                        resetEncoders = true;
                         currentState++;
                     } else {
                         driveBase.moveSpeed(0, 0, 1);
@@ -182,10 +190,11 @@ public class AutoRedShort extends OpMode {
 
                 case 3:
                     if (
-                        driveBase.odometry.getLeftEncoderTicksRaw() > -14007 - ERROR_RANGE &&
-                        driveBase.odometry.getRightEncoderTicksRaw() > -14111 - ERROR_RANGE
+                        Math.abs(driveBase.odometry.getLeftEncoderTicksRaw()) < 14007 - ERROR_RANGE &&
+                        Math.abs(driveBase.odometry.getRightEncoderTicksRaw()) < 14111 - ERROR_RANGE
                     ) {
                         driveBase.moveSpeed(0, 0, 0);
+                        resetEncoders = true;
                         currentState++;
                     } else {
                         driveBase.moveSpeed(0, 0, -1);
@@ -198,36 +207,42 @@ public class AutoRedShort extends OpMode {
         } else if (currentState == 4) {
             switch (teamPropSide) {
                 case 1:
-                    lift.setArmPosition(220);
-                    
+                    lift.setArmPosition(500);
+
+                    lift.setArmPosition(500);
                 case 2:
-                    lift.setArmPosition(150);
-                    
+
                 case 3:
-                    lift.setArmPosition(330);
+                    lift.setArmPosition(500);
                     
                 default:
                     break;
             }
+
+            if (lift.getLiftMotorTicks() >= lift.getLiftTargetPosition() - ERROR_RANGE &&
+                lift.getLiftMotorTicks() <= lift.getLiftTargetPosition() + ERROR_RANGE) {
+                resetEncoders = true;
+                currentState++;
+            }
                 
         } else if (currentState == 5) {
             // Open the claws to release and slightly raise the lift.
-            intake.closeClaws(false, true);
-            lift.setLiftPosition((int)((((LIFT_MOTOR_RPM * LIFT_ENC_RESOLUTION) / 360) / 360) * 28) * 45);
+            intake.closeClaws(true, false);
+
+            currentState++;
+            resetEncoders = true;
 
         } else if (currentState == 6) {
-            driveBase.odometry.resetEncoders();
-            
             // TODO: Add code to drive towards the backstage area while also facing the backdrop.
             // AVOID THE PIXEL IF ON THE RIGHT SIDE!
             switch (teamPropSide) {
                 case 1:
                     // Move to backdrop from left turn
-                    if (
+
                     
                 case 2:
                     // Move to backdrop from center turn
-                    driveBase.movePower(0, 1, 0);
+                    // driveBase.moveSpeed(0, 1, 0);
                     
                 case 3:
                     // Move to backdrop from right turn
