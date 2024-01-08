@@ -52,13 +52,11 @@ public class DriveBase extends Subsystem {
         rightOdometryLift = map.servo.get("DriveBase-RightOdometryLift");
         leftOdometryLift = map.servo.get("DriveBase-LeftOdometryLift");
         backOdometryLift = map.servo.get("DriveBase-BackOdometryLift");
-
-        /*
-            frontLeftWheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            frontRightWheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            backLeftWheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            backRightWheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        */
+        
+        frontLeftWheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        frontRightWheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backLeftWheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backRightWheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         backLeftWheel.setDirection(DcMotor.Direction.REVERSE);
         backRightWheel.setDirection(DcMotor.Direction.REVERSE);
