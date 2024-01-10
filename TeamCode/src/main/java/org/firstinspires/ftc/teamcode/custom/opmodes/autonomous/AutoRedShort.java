@@ -180,10 +180,8 @@ public class AutoRedShort extends OpMode {
         } else if (currentState == 2) {
             if (resetEncoders) { driveBase.odometry.resetEncoders(); resetEncoders = false; }
 
-            if (
-                    (Math.abs(driveBase.odometry.getLeftEncoderTicksRaw()) >= (24 * TICKS_PER_INCH) - ERROR_RANGE) &&
-                    (Math.abs(driveBase.odometry.getRightEncoderTicksRaw()) >= (24 * TICKS_PER_INCH) - ERROR_RANGE)
-            ) {
+            if (Math.abs(driveBase.odometry.getLeftEncoderTicksRaw()) >= (24 * TICKS_PER_INCH) - ERROR_RANGE &&
+                Math.abs(driveBase.odometry.getRightEncoderTicksRaw()) >= (24 * TICKS_PER_INCH) - ERROR_RANGE) {
                 driveBase.moveSpeed(0, 0, 0);
                 resetEncoders = true;
                 currentState++;
@@ -196,8 +194,10 @@ public class AutoRedShort extends OpMode {
             switch (teamPropSide) {
                 case 1:
                     if (
-                        heading >= 90 - (ERROR_RANGE / 4.0) &&
-                        heading <= 90 + (ERROR_RANGE / 4.0)
+                        // heading >= 90 - (ERROR_RANGE / 4.0) &&
+                        // heading <= 90 + (ERROR_RANGE / 4.0)
+                        (driveBase.odometry.getLeftEncoderTicksRaw() * -1) >= -15000 - ERROR_RANGE &&
+                        (driveBase.odometry.getLeftEncoderTicksRaw() * -1) <= -15000 + ERROR_RANGE
                     ) {
                         driveBase.moveSpeed(0, 0, 0);
                         resetEncoders = true;
@@ -216,8 +216,10 @@ public class AutoRedShort extends OpMode {
 
                 case 3:
                     if (
-                        heading >= -90 - (ERROR_RANGE / 4.0) &&
-                        heading <= -90 + (ERROR_RANGE / 4.0)
+                        // heading >= -90 - (ERROR_RANGE / 4.0) &&
+                        // heading <= -90 + (ERROR_RANGE / 4.0)
+                        (driveBase.odometry.getLeftEncoderTicksRaw() * -1) >= 15000 - ERROR_RANGE &&
+                        (driveBase.odometry.getLeftEncoderTicksRaw() * -1) <= 15000 + ERROR_RANGE
                     ) {
                         driveBase.moveSpeed(0, 0, 0);
                         resetEncoders = true;
@@ -238,19 +240,16 @@ public class AutoRedShort extends OpMode {
             switch (teamPropSide) {
                 case 1:
                     lift.setArmPosition(260);
-                    resetEncoders = true;
 
                     break;
 
                 case 2:
                     lift.setArmPosition(350);
-                    resetEncoders = true;
 
                     break;
 
                 case 3:
                     lift.setArmPosition(260);
-                    resetEncoders = true;
 
                     break;
                     
