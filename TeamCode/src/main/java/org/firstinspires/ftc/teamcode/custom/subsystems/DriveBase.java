@@ -28,7 +28,7 @@ public class DriveBase extends Subsystem {
     /**
      * @brief       Servos used for lifting and dropping servos from the ground.
      */
-    private final Servo rightOdometryLift, leftOdometryLift, backOdometryLift;
+    public final Servo rightOdometryLift, leftOdometryLift, backOdometryLift;
 
     /**
      * @brief       Multiplies speed of all motors in drive base. Could be used to tune how
@@ -52,7 +52,7 @@ public class DriveBase extends Subsystem {
         rightOdometryLift = map.servo.get("DriveBase-RightOdometryLift");
         leftOdometryLift = map.servo.get("DriveBase-LeftOdometryLift");
         backOdometryLift = map.servo.get("DriveBase-BackOdometryLift");
-        
+
         frontLeftWheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         frontRightWheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backLeftWheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);

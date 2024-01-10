@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.checkerframework.checker.units.qual.Angle;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -73,6 +74,7 @@ public class AutoRedShort extends OpMode {
 
         intake = new Intake(hardwareMap);
         intake.closeClaws(true, true);
+        intake.leftClaw.setDirection(Servo.Direction.REVERSE);
 
         imu = hardwareMap.get(IMU.class, "imu");
         imu.initialize(
@@ -241,7 +243,7 @@ public class AutoRedShort extends OpMode {
                     break;
 
                 case 2:
-                    lift.setArmPosition(260);
+                    lift.setArmPosition(350);
                     resetEncoders = true;
 
                     break;
@@ -277,7 +279,16 @@ public class AutoRedShort extends OpMode {
             // TODO: Add code to turn bot
             switch (teamPropSide) {
                 case 1:
-                    break;
+                    if (heading >= -90 - (ERROR_RANGE / 2.0) &&
+                        heading <= -90 + (ERROR_RANGE / 2.0)) {
+                        driveBase.moveSpeed(0, 0, 0);
+                        resetEncoders = true;
+                        currentState++;
+
+                        break;
+                    } else {
+                        driveBase.moveSpeed(0, 0, 1);
+                    }
 
                 case 2:
                     if (heading >= -90 - (ERROR_RANGE / 2.0) &&
@@ -285,11 +296,15 @@ public class AutoRedShort extends OpMode {
                         driveBase.moveSpeed(0, 0, 0);
                         resetEncoders = true;
                         currentState++;
+
+                        break;
                     } else {
                         driveBase.moveSpeed(0, 0, 1);
                     }
 
                 case 3:
+                    driveBase.backOdometryLift.setPosition(0.0);
+
                     break;
 
                 default:
@@ -297,15 +312,11 @@ public class AutoRedShort extends OpMode {
             }
 
         } else if (currentState == 7) {
-            // TODO: Add code to drive towards the backstage area while also facing the backdrop.
-            // AVOID THE PIXEL IF ON THE RIGHT SIDE!
+            if (resetEncoders) { driveBase.odometry.resetEncoders(); resetEncoders = false; }
+
             switch (teamPropSide) {
                 case 1:
-
-                    
-                case 2:
-                    if (Math.abs(driveBase.odometry.getLeftEncoderTicksRaw()) >= (30 * TICKS_PER_INCH) - ERROR_RANGE &&
-                        Math.abs(driveBase.odometry.getRightEncoderTicksRaw()) <= (30 * TICKS_PER_INCH) + ERROR_RANGE) {
+                    if (Math.abs(driveBase.odometry.getLeftEncoderTicksRaw()) >= (35 * TICKS_PER_INCH) - ERROR_RANGE) {
                         driveBase.moveSpeed(0, 0, 0);
                         resetEncoders = true;
                         currentState++;
@@ -315,35 +326,61 @@ public class AutoRedShort extends OpMode {
                         driveBase.moveSpeed(-1, 0, 0);
                     }
                     
+                case 2:
+                    if (Math.abs(driveBase.odometry.getLeftEncoderTicksRaw()) >= (35 * TICKS_PER_INCH) - ERROR_RANGE) {
+                        driveBase.moveSpeed(0, 0, 0);
+                        resetEncoders = true;
+                        currentState++;
+
+                        break;
+                    } else {
+                        driveBase.moveSpeed(-1, 0, 0);
+                    }
+
                 case 3:
-                    // Move to backdrop from right turn
-                    // TODO: Add code to move AROUND the right pixel.
+                    if (Math.abs(driveBase.odometry.getLeftEncoderTicksRaw()) >= (38 * TICKS_PER_INCH) - ERROR_RANGE) {
+                        driveBase.moveSpeed(0, 0, 0);
+                        resetEncoders = true;
+                        currentState++;
+
+                        break;
+                    } else {
+                        driveBase.moveSpeed(-1, 0, 0);
+                    }
                     
                 default:
                     break;
             }
 
         } else if (currentState == 8) {
-            /* TODO: Add code to either strafe across the backdrop or stay far back enough that
-                     the camera can see all three AprilTags on the backdrop. */
+            lift.setLiftPosition(Lift.LiftPosition.POSITION_LEVEL_1);
+            lift.setArmPosition(Lift.ArmPosition.POSITION_LEVEL_1);
+
+            resetEncoders = true;
+            currentState++;
 
         } else if (currentState == 9) {
-            // TODO: Raise lift high enough to place the remaining pixel on the backdrop.
-            lift.setLiftPosition(Lift.LiftPosition.POSITION_LEVEL_2);
-            lift.setArmPosition(Lift.ArmPosition.POSITION_LEVEL_2);
+            if (resetEncoders) { driveBase.odometry.resetEncoders(); resetEncoders = false; }
 
-        } else if (currentState == 10) {
-            /* TODO: Drive forward until the claw is pressed against the backdrop.
-                     Double check using the motor velocity. */
-
-        } else if (currentState == 11) {
             intake.closeClaws(false, false);
 
-        } else if (currentState == 12) {
-            /* TODO: Drive back a small amount that frees the pixel and lets it fall while also
-                     staying inside the parking zone for both sets of points. */
+            resetEncoders = true;
+            currentState++;
 
-        } else {
+        } else if (currentState == 10) {
+            if (resetEncoders) { driveBase.odometry.resetEncoders(); resetEncoders = false; }
+
+            if (driveBase.odometry.getLeftEncoderTicksRaw() >= TICKS_PER_INCH - ERROR_RANGE &&
+                driveBase.odometry.getRightEncoderTicksRaw() <= TICKS_PER_INCH + ERROR_RANGE) {
+                driveBase.moveSpeed(0, 0, 0);
+                resetEncoders = true;
+                currentState++;
+            } else {
+                driveBase.moveSpeed(0.25, 0, 0);
+            }
+
+        }
+        else {
             // There should NOT be any other states right now.
         }
 

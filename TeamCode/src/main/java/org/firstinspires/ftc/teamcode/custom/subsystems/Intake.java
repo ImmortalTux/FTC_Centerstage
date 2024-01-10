@@ -19,7 +19,7 @@ public class Intake extends Subsystem {
     /**
      * @brief       Servos controlling right and left claws respectively.
      */
-    private final Servo rightClaw, leftClaw;
+    public final Servo rightClaw, leftClaw;
 
     /**
      * @brief       Servo used to rotate entire Intake up and down.
@@ -119,7 +119,7 @@ public class Intake extends Subsystem {
     }
 
     private boolean compareAllPixelColors(Color input) {
-        final int TOLERANCE = 200;
+        final int TOLERANCE = 800;
         return (Color.compare(input, PixelColors.white, TOLERANCE)
                 || Color.compare(input, PixelColors.green, TOLERANCE)
                 || Color.compare(input, PixelColors.purple, TOLERANCE)
@@ -128,7 +128,6 @@ public class Intake extends Subsystem {
 
     /* Checks for pixels and automatically closes claws if any are found. */
     public boolean update(boolean leftCloseToggle, boolean rightCloseToggle, int liftEncoderPos) {
-        /*
         Color leftSensor = new Color(leftPixelConfirmation);
         Color rightSensor = new Color(rightPixelConfirmation);
 
@@ -140,16 +139,12 @@ public class Intake extends Subsystem {
             }
 
             if (compareAllPixelColors(rightSensor)) {
-                    rightCloseToggle = true;
-                    compareSuccessful = true;
-                }
+                rightCloseToggle = true;
+                compareSuccessful = true;
+            }
         }
 
         closeClaws(leftCloseToggle, rightCloseToggle);
         return compareSuccessful;
-        */
-
-        closeClaws(leftCloseToggle, rightCloseToggle);
-        return true;
     }
 }
