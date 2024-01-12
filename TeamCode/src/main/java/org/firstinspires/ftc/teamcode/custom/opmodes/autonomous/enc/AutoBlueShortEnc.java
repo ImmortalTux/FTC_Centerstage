@@ -2,27 +2,24 @@ package org.firstinspires.ftc.teamcode.custom.opmodes.autonomous.enc;
 
 import android.util.Size;
 
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.teamcode.custom.Clock;
 import org.firstinspires.ftc.teamcode.custom.subsystems.DriveBase;
 import org.firstinspires.ftc.teamcode.custom.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.custom.subsystems.Lift;
 import org.firstinspires.ftc.vision.VisionPortal;
-import org.firstinspires.ftc.vision.tfod.TfodProcessor;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+import org.firstinspires.ftc.vision.tfod.TfodProcessor;
 
 import java.util.List;
 
-@Autonomous(name = "Autonomous - Red Short - Encoders")
-public class AutoRedShortEnc extends OpMode {
+@Autonomous(name = "Autonomous - Blue Short - Encoders")
+public class AutoBlueShortEnc extends OpMode {
     private DriveBase driveBase = null;
     private Lift lift = null;
     private Intake intake = null;
@@ -154,8 +151,8 @@ public class AutoRedShortEnc extends OpMode {
         } else if (currentState == 2) {
             if (resetEncoders) { driveBase.odometry.resetEncoders(); resetEncoders = false; }
 
-            if (Math.abs(driveBase.odometry.getLeftEncoderTicksRaw()) >= (24 * TICKS_PER_INCH) - ERROR_RANGE &&
-                Math.abs(driveBase.odometry.getRightEncoderTicksRaw()) >= (24 * TICKS_PER_INCH) - ERROR_RANGE) {
+            if (Math.abs(driveBase.odometry.getLeftEncoderTicksRaw()) >= (25 * TICKS_PER_INCH) - ERROR_RANGE &&
+                Math.abs(driveBase.odometry.getRightEncoderTicksRaw()) >= (25 * TICKS_PER_INCH) - ERROR_RANGE) {
                 driveBase.moveSpeed(0, 0, 0);
                 resetEncoders = true;
                 currentState++;
@@ -167,7 +164,7 @@ public class AutoRedShortEnc extends OpMode {
 
             switch (teamPropSide) {
                 case 1:
-                    if (driveBase.odometry.getBackEncoderTicksRaw() <= -TICKS_PER_RIGHT_TURN) {
+                    if (driveBase.odometry.getBackEncoderTicksRaw() <= -11000) {
                         driveBase.moveSpeed(0, 0, 0);
                         resetEncoders = true;
                         currentState++;
@@ -248,7 +245,14 @@ public class AutoRedShortEnc extends OpMode {
             // TODO: Add code to turn bot
             switch (teamPropSide) {
                 case 1:
-                    if (driveBase.odometry.getBackEncoderTicksRaw() <= -21500) {
+                    driveBase.backOdometryLift.setPosition(0.0);
+                    resetEncoders = true;
+                    currentState++;
+
+                    break;
+
+                case 2:
+                    if (driveBase.odometry.getBackEncoderTicksRaw() <= -8500) {
                         driveBase.moveSpeed(0, 0, 0);
                         resetEncoders = true;
                         currentState++;
@@ -260,8 +264,8 @@ public class AutoRedShortEnc extends OpMode {
 
                     break;
 
-                case 2:
-                    if (driveBase.odometry.getBackEncoderTicksRaw() >= 8500) {
+                case 3:
+                    if (driveBase.odometry.getBackEncoderTicksRaw() >= 21500) {
                         driveBase.moveSpeed(0, 0, 0);
                         resetEncoders = true;
                         currentState++;
@@ -270,13 +274,6 @@ public class AutoRedShortEnc extends OpMode {
                     } else {
                         driveBase.moveSpeed(0, 0, -1);
                     }
-
-                    break;
-
-                case 3:
-                    driveBase.backOdometryLift.setPosition(0.0);
-                    resetEncoders = true;
-                    currentState++;
 
                     break;
 
