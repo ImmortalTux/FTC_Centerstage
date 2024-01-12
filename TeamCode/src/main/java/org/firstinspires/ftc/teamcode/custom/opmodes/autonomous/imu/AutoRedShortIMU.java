@@ -207,6 +207,8 @@ public class AutoRedShortIMU extends OpMode {
                         driveBase.moveSpeed(0, 0, 1);
                     }
 
+                    break;
+
                 case 2:
                     resetEncoders = true;
                     currentState++;
@@ -224,6 +226,8 @@ public class AutoRedShortIMU extends OpMode {
                     } else {
                         driveBase.moveSpeed(0, 0, 1);
                     }
+
+                    break;
 
                 default:
                     break;
