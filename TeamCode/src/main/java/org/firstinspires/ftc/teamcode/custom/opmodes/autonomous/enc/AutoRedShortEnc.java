@@ -27,14 +27,12 @@ public class AutoRedShortEnc extends OpMode {
     private Lift lift = null;
     private Intake intake = null;
 
-    private IMU imu = null;
-    private double heading;
-
     private final int LIFT_MOTOR_RPM = 312;
     private final double LIFT_ENC_RESOLUTION = 537.7;
     private static final int ERROR_RANGE = 300;
     private static final int TICKS_PER_INCH = 1711;
-    private static final int TICKS_PER_RIGHT_TURN = 11500;
+    private static final int TICKS_PER_RIGHT_TURN = 11200;
+    private static final int TICKS_PER_RIGHT_TURN_2 = 11000;
 
     private int currentState;
 
@@ -64,7 +62,7 @@ public class AutoRedShortEnc extends OpMode {
     public void init() {
         driveBase = new DriveBase(hardwareMap);
         driveBase.dropOdometry(true);
-        driveBase.motorSpeedMultiplier = 0.33;
+        driveBase.motorSpeedMultiplier = 0.25;
         driveBase.odometry.resetEncoders();
 
         lift = new Lift(hardwareMap);
@@ -145,8 +143,6 @@ public class AutoRedShortEnc extends OpMode {
         Clock.updateDeltaTime();
         driveBase.odometry.update(telemetry);
 
-        heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
-
         if (currentState == 1) {
             lift.setLiftPosition(0);
             if (lift.getLiftMotorTicks() >= -ERROR_RANGE &&
@@ -189,7 +185,7 @@ public class AutoRedShortEnc extends OpMode {
                     break;
 
                 case 3:
-                    if (driveBase.odometry.getBackEncoderTicksRaw() >= TICKS_PER_RIGHT_TURN) {
+                    if (driveBase.odometry.getBackEncoderTicksRaw() >= TICKS_PER_RIGHT_TURN_2) {
                         driveBase.moveSpeed(0, 0, 0);
                         resetEncoders = true;
                         currentState++;
@@ -209,7 +205,7 @@ public class AutoRedShortEnc extends OpMode {
 
             switch (teamPropSide) {
                 case 1:
-                    lift.setArmPosition(300);
+                    lift.setArmPosition(280);
 
                     break;
 
@@ -252,7 +248,7 @@ public class AutoRedShortEnc extends OpMode {
             // TODO: Add code to turn bot
             switch (teamPropSide) {
                 case 1:
-                    if (driveBase.odometry.getBackEncoderTicksRaw() <= -27550) {
+                    if (driveBase.odometry.getBackEncoderTicksRaw() <= -22500) {
                         driveBase.moveSpeed(0, 0, 0);
                         resetEncoders = true;
                         currentState++;
@@ -293,7 +289,7 @@ public class AutoRedShortEnc extends OpMode {
 
             switch (teamPropSide) {
                 case 1:
-                    if (Math.abs(driveBase.odometry.getLeftEncoderTicksRaw()) >= (36 * TICKS_PER_INCH) - ERROR_RANGE) {
+                    if (Math.abs(driveBase.odometry.getLeftEncoderTicksRaw()) >= (37 * TICKS_PER_INCH) - ERROR_RANGE) {
                         driveBase.moveSpeed(0, 0, 0);
                         resetEncoders = true;
                         currentState++;
@@ -304,7 +300,7 @@ public class AutoRedShortEnc extends OpMode {
                     }
                     
                 case 2:
-                    if (Math.abs(driveBase.odometry.getLeftEncoderTicksRaw()) >= (36 * TICKS_PER_INCH) - ERROR_RANGE) {
+                    if (Math.abs(driveBase.odometry.getLeftEncoderTicksRaw()) >= (37 * TICKS_PER_INCH) - ERROR_RANGE) {
                         driveBase.moveSpeed(0, 0, 0);
                         resetEncoders = true;
                         currentState++;
@@ -354,8 +350,6 @@ public class AutoRedShortEnc extends OpMode {
         telemetry.addData("L Odo", driveBase.odometry.getLeftEncoderTicksRaw());
         telemetry.addData("R Odo", driveBase.odometry.getRightEncoderTicksRaw());
         telemetry.addData("B Odo", driveBase.odometry.getBackEncoderTicksRaw());
-        telemetry.addData("Heading", heading);
-        telemetry.addData("Real Heading", imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES));
 
         telemetry.update();
     }
