@@ -1,9 +1,7 @@
 package org.firstinspires.ftc.teamcode.custom.opmodes.autonomous.enc;
 
-import android.speech.tts.TextToSpeech;
 import android.util.Size;
 
-import com.qualcomm.hardware.bosch.BHI260IMU;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -52,7 +50,6 @@ public class AutoRedShortEnc extends OpMode {
     private TfodProcessor tfodProcessor = null;
     private VisionPortal visionPortal = null;
     private static final String TFOD_MODEL_FILE = "/sdcard/FIRST/tflitemodels/22347-teampiece.tflite";
-    // private static final String TFOD_MODEL_FILE = Environment.getExternalStorageDirectory().getPath() + "/FIRST/tflitemodels/22347-teampiece.tflite";
     private static final String[] MODEL_LABELS = {
             "Piece"
     };
@@ -76,18 +73,6 @@ public class AutoRedShortEnc extends OpMode {
         intake.closeClaws(true, true);
         intake.leftClaw.setDirection(Servo.Direction.REVERSE);
 
-        imu = hardwareMap.get(IMU.class, "imu");
-        imu.initialize(
-                new IMU.Parameters(
-                        new RevHubOrientationOnRobot(
-                                RevHubOrientationOnRobot.LogoFacingDirection.DOWN,
-                                RevHubOrientationOnRobot.UsbFacingDirection.LEFT
-                        )
-                )
-        );
-        imu.resetYaw();
-        heading = 0.0;
-
         currentState = 0;
 
         resetEncoders = true;
@@ -107,11 +92,6 @@ public class AutoRedShortEnc extends OpMode {
 
         visionPortal.setProcessorEnabled(tfodProcessor, true);
         tfodProcessor.setMinResultConfidence(0.75f);
-
-        // aprilTagProcessor =
-        //     new AprilTagProcessorBuilder
-        //         .setTagLibrary(AprilTagGameDatabase.getCurrentGameTagLibrary())
-        //         .build();
 
         telemetry.addLine("REMEMBER!");
         telemetry.addLine("Wait at least 5-10 seconds to MAKE sure that TensorFlow can find the team prop.");
@@ -171,8 +151,6 @@ public class AutoRedShortEnc extends OpMode {
             lift.setLiftPosition(0);
             if (lift.getLiftMotorTicks() >= -ERROR_RANGE &&
                 lift.getLiftMotorTicks() <= ERROR_RANGE) {
-                // Lift position is 0 so 0 - ERROR_RANGE will just equal -ERROR_RANGE.
-                // and the same goes for 0 + ERROR_RANGE, it will just be (+)ERROR_RANGE.
                 resetEncoders = true;
                 currentState++;
             }
@@ -193,10 +171,7 @@ public class AutoRedShortEnc extends OpMode {
 
             switch (teamPropSide) {
                 case 1:
-                    if (
-                        // driveBase.odometry.getBackEncoderTicksRaw() >= -TICKS_PER_RIGHT_TURN - ERROR_RANGE &&
-                        driveBase.odometry.getBackEncoderTicksRaw() <= -TICKS_PER_RIGHT_TURN /* + ERROR_RANGE */
-                    ) {
+                    if (driveBase.odometry.getBackEncoderTicksRaw() <= -TICKS_PER_RIGHT_TURN) {
                         driveBase.moveSpeed(0, 0, 0);
                         resetEncoders = true;
                         currentState++;
@@ -214,12 +189,7 @@ public class AutoRedShortEnc extends OpMode {
                     break;
 
                 case 3:
-                    if (
-                        // heading >= -90 - (ERROR_RANGE / 4.0) &&
-                        // heading <= -90 + (ERROR_RANGE / 4.0)
-                        driveBase.odometry.getBackEncoderTicksRaw() >= TICKS_PER_RIGHT_TURN /* - ERROR_RANGE && */
-                        // driveBase.odometry.getBackEncoderTicksRaw() <= TICKS_PER_RIGHT_TURN + ERROR_RANGE
-                    ) {
+                    if (driveBase.odometry.getBackEncoderTicksRaw() >= TICKS_PER_RIGHT_TURN) {
                         driveBase.moveSpeed(0, 0, 0);
                         resetEncoders = true;
                         currentState++;
@@ -295,8 +265,7 @@ public class AutoRedShortEnc extends OpMode {
                     break;
 
                 case 2:
-                    if (driveBase.odometry.getBackEncoderTicksRaw() >= TICKS_PER_RIGHT_TURN)
-                        /* (driveBase.odometry.getBackEncoderTicksRaw() * -1) <= TICKS_PER_RIGHT_TURN + ERROR_RANGE) */ {
+                    if (driveBase.odometry.getBackEncoderTicksRaw() >= TICKS_PER_RIGHT_TURN) {
                         driveBase.moveSpeed(0, 0, 0);
                         resetEncoders = true;
                         currentState++;
