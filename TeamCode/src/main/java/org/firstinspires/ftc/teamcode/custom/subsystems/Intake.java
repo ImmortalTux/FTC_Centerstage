@@ -134,23 +134,28 @@ public class Intake extends Subsystem {
 
     /* Checks for pixels and automatically closes claws if any are found. */
     public boolean update(boolean leftCloseToggle, boolean rightCloseToggle, int liftEncoderPos) {
-        Color leftSensor = new Color(leftPixelConfirmation);
-        Color rightSensor = new Color(rightPixelConfirmation);
+        /*
+            Color leftSensor = new Color(leftPixelConfirmation);
+            Color rightSensor = new Color(rightPixelConfirmation);
 
-        boolean compareSuccessful = false;
-        if (liftEncoderPos < 5) {
-            if (compareAllPixelColors(leftSensor)) {
-                leftCloseToggle = true;
-                compareSuccessful = true;
+            boolean compareSuccessful = false;
+            if (liftEncoderPos < 5) {
+                if (compareAllPixelColors(leftSensor)) {
+                    leftCloseToggle = true;
+                    compareSuccessful = true;
+                }
+
+                if (compareAllPixelColors(rightSensor)) {
+                    rightCloseToggle = true;
+                    compareSuccessful = true;
+                }
             }
 
-            if (compareAllPixelColors(rightSensor)) {
-                rightCloseToggle = true;
-                compareSuccessful = true;
-            }
-        }
+            closeClaws(leftCloseToggle, rightCloseToggle);
+            return compareSuccessful;
+         */
 
         closeClaws(leftCloseToggle, rightCloseToggle);
-        return compareSuccessful;
+        return false;
     }
 }
