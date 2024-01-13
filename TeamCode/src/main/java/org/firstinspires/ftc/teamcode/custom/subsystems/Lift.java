@@ -69,6 +69,7 @@ public class Lift extends Subsystem {
         liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         liftMotor.setPower(1.0);
 
+        armMotor.setDirection(DcMotor.Direction.REVERSE);
         armMotor.setTargetPosition(0);
         armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);

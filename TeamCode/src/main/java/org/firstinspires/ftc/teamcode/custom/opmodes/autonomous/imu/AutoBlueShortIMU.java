@@ -16,13 +16,13 @@ import org.firstinspires.ftc.teamcode.custom.subsystems.DriveBase;
 import org.firstinspires.ftc.teamcode.custom.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.custom.subsystems.Lift;
 import org.firstinspires.ftc.vision.VisionPortal;
-import org.firstinspires.ftc.vision.tfod.TfodProcessor;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+import org.firstinspires.ftc.vision.tfod.TfodProcessor;
 
 import java.util.List;
 
-@Autonomous(name = "Autonomous - Red Short - IMU")
-public class AutoRedShortIMU extends OpMode {
+@Autonomous(name = "Autonomous - Blue Short - IMU")
+public class AutoBlueShortIMU extends OpMode {
     private DriveBase driveBase = null;
     private Lift lift = null;
     private Intake intake = null;
@@ -178,8 +178,8 @@ public class AutoRedShortIMU extends OpMode {
             if (resetEncoders) { driveBase.odometry.resetEncoders(); resetEncoders = false; }
 
             if (
-                    (Math.abs(driveBase.odometry.getLeftEncoderTicksRaw()) >= (25 * TICKS_PER_INCH) - ERROR_RANGE) &&
-                    (Math.abs(driveBase.odometry.getRightEncoderTicksRaw()) >= (25 * TICKS_PER_INCH) - ERROR_RANGE)
+                    (Math.abs(driveBase.odometry.getLeftEncoderTicksRaw()) >= (26 * TICKS_PER_INCH) - ERROR_RANGE) &&
+                    (Math.abs(driveBase.odometry.getRightEncoderTicksRaw()) >= (26 * TICKS_PER_INCH) - ERROR_RANGE)
             ) {
                 driveBase.moveSpeed(0, 0, 0);
                 resetEncoders = true;
@@ -193,8 +193,8 @@ public class AutoRedShortIMU extends OpMode {
 
             switch (teamPropSide) {
                 case 1:
-                    if (heading >= 75 - (ERROR_RANGE / 4.0) &&
-                        heading <= 75 + (ERROR_RANGE / 4.0)) {
+                    if (heading >= 90 - (ERROR_RANGE / 4.0) &&
+                        heading <= 90 + (ERROR_RANGE / 4.0)) {
                         driveBase.moveSpeed(0, 0, 0);
                         resetEncoders = true;
                         currentState++;
@@ -242,14 +242,14 @@ public class AutoRedShortIMU extends OpMode {
                     break;
 
                 case 2:
-                    lift.setArmPosition(350);
+                    lift.setArmPosition(300);
                     resetEncoders = true;
                     currentState++;
 
                     break;
 
                 case 3:
-                    lift.setArmPosition(200);
+                    lift.setArmPosition(150);
                     resetEncoders = true;
                     currentState++;
 
@@ -277,6 +277,7 @@ public class AutoRedShortIMU extends OpMode {
             // TODO: Add code to turn bot
             switch (teamPropSide) {
                 case 1:
+                    /*
                     if (heading >= -90 - (ERROR_RANGE / 4.0) &&
                         heading <= -90 + (ERROR_RANGE / 4.0)) {
                         driveBase.moveSpeed(0, 0, 0);
@@ -287,12 +288,17 @@ public class AutoRedShortIMU extends OpMode {
                     } else {
                         driveBase.moveSpeed(0, 0, 1);
                     }
+                    */
+
+                    driveBase.backOdometryLift.setPosition(0);
+                    resetEncoders = true;
+                    currentState++;
 
                     break;
 
                 case 2:
-                    if (heading >= -90 - (ERROR_RANGE / 4.0) &&
-                        heading <= -90 + (ERROR_RANGE / 4.0)) {
+                    if (heading >= 90 - (ERROR_RANGE / 4.0) &&
+                        heading <= 90 + (ERROR_RANGE / 4.0)) {
                         driveBase.moveSpeed(0, 0, 0);
                         resetEncoders = true;
                         currentState++;
@@ -305,10 +311,16 @@ public class AutoRedShortIMU extends OpMode {
                     break;
 
                 case 3:
-                    driveBase.backOdometryLift.setPosition(0.0);
+                    if (heading >= 90 - (ERROR_RANGE / 4.0) &&
+                        heading <= 90 + (ERROR_RANGE / 4.0)) {
+                        driveBase.moveSpeed(0, 0, 0);
+                        resetEncoders = true;
+                        currentState++;
 
-                    resetEncoders = true;
-                    currentState++;
+                        break;
+                    } else {
+                        driveBase.moveSpeed(0, 0, 1);
+                    }
 
                     break;
 
@@ -334,7 +346,7 @@ public class AutoRedShortIMU extends OpMode {
                     break;
 
                 case 2:
-                    if (Math.abs(driveBase.odometry.getLeftEncoderTicksRaw()) >= (35 * TICKS_PER_INCH) - ERROR_RANGE) {
+                    if (Math.abs(driveBase.odometry.getLeftEncoderTicksRaw()) >= (40 * TICKS_PER_INCH) - ERROR_RANGE) {
                         driveBase.moveSpeed(0, 0, 0);
                         resetEncoders = true;
                         currentState++;
@@ -347,7 +359,7 @@ public class AutoRedShortIMU extends OpMode {
                     break;
 
                 case 3:
-                    if (Math.abs(driveBase.odometry.getLeftEncoderTicksRaw()) >= (37 * TICKS_PER_INCH) - ERROR_RANGE) {
+                    if (Math.abs(driveBase.odometry.getLeftEncoderTicksRaw()) >= (39 * TICKS_PER_INCH) - ERROR_RANGE) {
                         driveBase.moveSpeed(0, 0, 0);
                         resetEncoders = true;
                         currentState++;

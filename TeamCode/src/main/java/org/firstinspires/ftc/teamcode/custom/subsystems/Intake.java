@@ -9,6 +9,7 @@ public class Intake extends Subsystem {
         static public final Color green = new Color(320, 1000, 395, 537);
         static public final Color purple = new Color(800, 1245, 1650, 1250);
         static public final Color yellow = new Color(1050, 1500, 410, 995);
+        static public final Color floor = new Color(0, 0, 0, 0);
     }
 
     /**
@@ -118,12 +119,17 @@ public class Intake extends Subsystem {
         return leftPixelConfirmation;
     }
 
+    public ColorSensor getRightPixelConfirmation() {
+        return rightPixelConfirmation;
+    }
+
     private boolean compareAllPixelColors(Color input) {
         final int TOLERANCE = 800;
-        return (Color.compare(input, PixelColors.white, TOLERANCE)
+        /* return (Color.compare(input, PixelColors.white, TOLERANCE)
                 || Color.compare(input, PixelColors.green, TOLERANCE)
                 || Color.compare(input, PixelColors.purple, TOLERANCE)
-                || Color.compare(input, PixelColors.yellow, TOLERANCE));
+                || Color.compare(input, PixelColors.yellow, TOLERANCE)); */
+        return Color.compare(input, PixelColors.floor, TOLERANCE);
     }
 
     /* Checks for pixels and automatically closes claws if any are found. */
