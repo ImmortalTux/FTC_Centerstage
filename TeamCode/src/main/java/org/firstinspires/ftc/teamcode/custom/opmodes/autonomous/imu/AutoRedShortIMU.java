@@ -37,6 +37,8 @@ public class AutoRedShortIMU extends OpMode {
 
     private int currentState;
 
+    private int lastEncoderTicksAbs;
+
     // 0 is unchanged (no side identified)
     // 1 is Left
     // 2 is Center
@@ -178,8 +180,8 @@ public class AutoRedShortIMU extends OpMode {
             if (resetEncoders) { driveBase.odometry.resetEncoders(); resetEncoders = false; }
 
             if (
-                    (Math.abs(driveBase.odometry.getLeftEncoderTicksRaw()) >= (25 * TICKS_PER_INCH) - ERROR_RANGE) &&
-                    (Math.abs(driveBase.odometry.getRightEncoderTicksRaw()) >= (25 * TICKS_PER_INCH) - ERROR_RANGE)
+                    (Math.abs(driveBase.odometry.getLeftEncoderTicksRaw()) >= (26 * TICKS_PER_INCH) - ERROR_RANGE) &&
+                    (Math.abs(driveBase.odometry.getRightEncoderTicksRaw()) >= (26 * TICKS_PER_INCH) - ERROR_RANGE)
             ) {
                 driveBase.moveSpeed(0, 0, 0);
                 resetEncoders = true;
@@ -193,8 +195,8 @@ public class AutoRedShortIMU extends OpMode {
 
             switch (teamPropSide) {
                 case 1:
-                    if (heading >= 75 - (ERROR_RANGE / 4.0) &&
-                        heading <= 75 + (ERROR_RANGE / 4.0)) {
+                    if (heading >= 45 - (ERROR_RANGE / 4.0) &&
+                        heading <= 45 + (ERROR_RANGE / 4.0)) {
                         driveBase.moveSpeed(0, 0, 0);
                         resetEncoders = true;
                         currentState++;
@@ -285,15 +287,30 @@ public class AutoRedShortIMU extends OpMode {
 
                         break;
                     } else {
-                        driveBase.moveSpeed(0, 0, 1);
+                        driveBase.moveSpeed(0, 0, -1);
                     }
 
                     break;
 
                 case 2:
-                    if (heading >= -90 - (ERROR_RANGE / 4.0) &&
-                        heading <= -90 + (ERROR_RANGE / 4.0)) {
+                    if (heading >= -80 - (ERROR_RANGE / 4.0) &&
+                        heading <= -80 + (ERROR_RANGE / 4.0)) {
                         driveBase.moveSpeed(0, 0, 0);
+                        resetEncoders = true;
+                        currentState++;
+
+                        break;
+                    } else {
+                        driveBase.moveSpeed(0, 0, -1);
+                    }
+
+                    break;
+
+                case 3:
+                    if (heading >= -80 - (ERROR_RANGE / 4.0) &&
+                        heading <= -80 + (ERROR_RANGE / 4.0)) {
+                        driveBase.moveSpeed(0, 0, 0);
+                        driveBase.backOdometryLift.setPosition(0.0);
                         resetEncoders = true;
                         currentState++;
 
@@ -301,14 +318,6 @@ public class AutoRedShortIMU extends OpMode {
                     } else {
                         driveBase.moveSpeed(0, 0, 1);
                     }
-
-                    break;
-
-                case 3:
-                    driveBase.backOdometryLift.setPosition(0.0);
-
-                    resetEncoders = true;
-                    currentState++;
 
                     break;
 
@@ -318,10 +327,11 @@ public class AutoRedShortIMU extends OpMode {
 
         } else if (currentState == 7) {
             if (resetEncoders) { driveBase.odometry.resetEncoders(); resetEncoders = false; }
+            int encoderTicksAbs = Math.abs(driveBase.odometry.getLeftEncoderTicksRaw());
 
             switch (teamPropSide) {
                 case 1:
-                    if (Math.abs(driveBase.odometry.getLeftEncoderTicksRaw()) >= (36 * TICKS_PER_INCH) - ERROR_RANGE) {
+                    if (encoderTicksAbs >= (33 * TICKS_PER_INCH) - ERROR_RANGE || (encoderTicksAbs >= (10 * TICKS_PER_INCH) && lastEncoderTicksAbs == encoderTicksAbs)) {
                         driveBase.moveSpeed(0, 0, 0);
                         resetEncoders = true;
                         currentState++;
@@ -334,7 +344,7 @@ public class AutoRedShortIMU extends OpMode {
                     break;
 
                 case 2:
-                    if (Math.abs(driveBase.odometry.getLeftEncoderTicksRaw()) >= (35 * TICKS_PER_INCH) - ERROR_RANGE) {
+                    if (encoderTicksAbs >= (33 * TICKS_PER_INCH) - ERROR_RANGE || (encoderTicksAbs >= (10 * TICKS_PER_INCH) && lastEncoderTicksAbs == encoderTicksAbs)) {
                         driveBase.moveSpeed(0, 0, 0);
                         resetEncoders = true;
                         currentState++;
@@ -347,7 +357,7 @@ public class AutoRedShortIMU extends OpMode {
                     break;
 
                 case 3:
-                    if (Math.abs(driveBase.odometry.getLeftEncoderTicksRaw()) >= (37 * TICKS_PER_INCH) - ERROR_RANGE) {
+                    if (encoderTicksAbs >= (33 * TICKS_PER_INCH) - ERROR_RANGE || (encoderTicksAbs >= (10 * TICKS_PER_INCH) && lastEncoderTicksAbs == encoderTicksAbs)) {
                         driveBase.moveSpeed(0, 0, 0);
                         resetEncoders = true;
                         currentState++;
@@ -363,10 +373,14 @@ public class AutoRedShortIMU extends OpMode {
                     break;
             }
 
+            lastEncoderTicksAbs = encoderTicksAbs;
+
         } else if (currentState == 8) {
             // lift.setLiftPosition(Lift.LiftPosition.POSITION_LEVEL_1);
             lift.setLiftPosition(1700);
             lift.setArmPosition(Lift.ArmPosition.POSITION_LEVEL_1);
+
+            driveBase.backOdometryLift.setPosition(0.5);
 
             resetEncoders = true;
             currentState++;
@@ -382,17 +396,17 @@ public class AutoRedShortIMU extends OpMode {
         } else if (currentState == 10) {
             if (resetEncoders) { driveBase.odometry.resetEncoders(); resetEncoders = false; }
 
-            if (driveBase.odometry.getLeftEncoderTicksRaw() >= TICKS_PER_INCH - ERROR_RANGE &&
-                    driveBase.odometry.getRightEncoderTicksRaw() <= TICKS_PER_INCH + ERROR_RANGE) {
+            if (driveBase.odometry.getBackEncoderTicksRaw() <= -43000) {
                 driveBase.moveSpeed(0, 0, 0);
                 resetEncoders = true;
                 currentState++;
             } else {
-                driveBase.moveSpeed(0.25, 0, 0);
+                driveBase.frontLeftWheel.setPower(0.25);
+                driveBase.frontRightWheel.setPower(-0.25);
+                driveBase.backLeftWheel.setPower(-0.25);
+                driveBase.backRightWheel.setPower(0.25);
             }
-
-        }
-        else {
+        } else {
             // There should NOT be any other states right now.
         }
 

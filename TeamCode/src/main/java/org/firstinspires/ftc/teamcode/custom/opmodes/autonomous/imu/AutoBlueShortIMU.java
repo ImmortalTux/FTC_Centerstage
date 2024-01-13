@@ -35,6 +35,8 @@ public class AutoBlueShortIMU extends OpMode {
     private static final int ERROR_RANGE = 10;
     private static final int TICKS_PER_INCH = 1711; // TODO: Update this!
 
+    private int lastEncoderTicksAbs = 0;
+
     private int currentState;
 
     // 0 is unchanged (no side identified)
@@ -330,10 +332,11 @@ public class AutoBlueShortIMU extends OpMode {
 
         } else if (currentState == 7) {
             if (resetEncoders) { driveBase.odometry.resetEncoders(); resetEncoders = false; }
+            int encoderTicksAbs = Math.abs(driveBase.odometry.getLeftEncoderTicksRaw());
 
             switch (teamPropSide) {
                 case 1:
-                    if (Math.abs(driveBase.odometry.getLeftEncoderTicksRaw()) >= (36 * TICKS_PER_INCH) - ERROR_RANGE) {
+                    if (encoderTicksAbs >= (36 * TICKS_PER_INCH) - ERROR_RANGE || (encoderTicksAbs >= (10 * TICKS_PER_INCH) && lastEncoderTicksAbs == encoderTicksAbs)) {
                         driveBase.moveSpeed(0, 0, 0);
                         resetEncoders = true;
                         currentState++;
@@ -346,7 +349,7 @@ public class AutoBlueShortIMU extends OpMode {
                     break;
 
                 case 2:
-                    if (Math.abs(driveBase.odometry.getLeftEncoderTicksRaw()) >= (40 * TICKS_PER_INCH) - ERROR_RANGE) {
+                    if (encoderTicksAbs >= (38 * TICKS_PER_INCH) - ERROR_RANGE || (encoderTicksAbs >= (10 * TICKS_PER_INCH) && lastEncoderTicksAbs == encoderTicksAbs)) {
                         driveBase.moveSpeed(0, 0, 0);
                         resetEncoders = true;
                         currentState++;
@@ -359,7 +362,7 @@ public class AutoBlueShortIMU extends OpMode {
                     break;
 
                 case 3:
-                    if (Math.abs(driveBase.odometry.getLeftEncoderTicksRaw()) >= (39 * TICKS_PER_INCH) - ERROR_RANGE) {
+                    if (encoderTicksAbs >= (38 * TICKS_PER_INCH) - ERROR_RANGE || (encoderTicksAbs >= (10 * TICKS_PER_INCH) && lastEncoderTicksAbs == encoderTicksAbs)) {
                         driveBase.moveSpeed(0, 0, 0);
                         resetEncoders = true;
                         currentState++;
@@ -374,6 +377,8 @@ public class AutoBlueShortIMU extends OpMode {
                 default:
                     break;
             }
+
+            lastEncoderTicksAbs = encoderTicksAbs;
 
         } else if (currentState == 8) {
             // lift.setLiftPosition(Lift.LiftPosition.POSITION_LEVEL_1);
